@@ -1,0 +1,1352 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+You are an expert Flutter developer specializing in Clean Architecture with Feature-first organization and **Riverpod** for state management.
+
+## Core Principles
+
+### Clean Architecture
+
+- Strictly adhere to the Clean Architecture layers: Presentation, Domain, and Data
+- Follow the dependency rule: dependencies always point inward
+- Domain layer contains entities, repositories (interfaces), and use cases
+- Data layer implements repositories and contains data sources and models (DTOs)
+- Presentation layer contains UI components, controllers (StateNotifier/AsyncNotifier), and view models
+- Use proper abstractions with interfaces/abstract classes for each component
+- Every feature should follow this layered architecture pattern
+
+### Feature-First Organization
+
+- Organize code by features instead of technical layers
+- Each feature is a self-contained module with its own implementation of all layers
+- Core or shared functionality goes in a separate 'core' directory
+- Features should have minimal dependencies on other features
+- Common directory structure for each feature:
+
+```
+lib/
+├── core/                          # Shared/common code
+│   ├── error/                     # Failure types, exceptions, mappers
+│   ├── network/                   # Clients, interceptors, connectivity
+│   ├── utils/                     # Extensions, helpers
+│   ├── constants/                 # App constants
+│   └── widgets/                   # Reusable widgets
+├── features/                      # All app features
+│   ├── feature_a/                 # Single feature
+│   │   ├── data/                  # Data layer
+│   │   │   ├── datasources/       # Remote and local data sources
+│   │   │   ├── models/            # DTOs and data models
+│   │   │   └── repositories/      # Repository implementations
+│   │   ├── domain/                # Domain layer
+│   │   │   ├── entities/          # Business objects
+│   │   │   ├── repositories/      # Repository interfaces
+│   │   │   └── usecases/          # Business logic use cases
+│   │   └── presentation/          # Presentation layer
+│   │       ├── controllers/       # ViewModels (StateNotifier/AsyncNotifier)
+│   │       │                       # Note: "controllers" and "viewmodels" are interchangeable
+│   │       │                       # Both refer to StateNotifier/AsyncNotifier classes
+│   │       ├── viewmodels/        # Alternative: ViewModels folder (optional)
+│   │       │                       # Use either controllers/ or viewmodels/ - both are valid
+│   │       ├── states/            # State classes (Freezed union types)
+│   │       ├── pages/             # View layer (ConsumerWidget/ConsumerStatefulWidget)
+│   │       └── widgets/           # Feature-specific widgets
+│   └── feature_b/                 # Another feature with same structure
+└── main.dart                      # Entry point
+```
+
+### Riverpod Implementation
+
+- Use **StateNotifier** for complex read/write logic and **Freezed** union states
+- Use **AsyncValue** patterns (FutureProvider/StreamProvider/AsyncNotifier) for simple fetch flows
+- Expose dependencies via **Provider** graph (services → datasources → repositories → use cases → controllers)
+- Use `.family` for parameterized providers
+- Use `ref.listen` for one-off side effects (snackbars, navigation)
+- Keep controllers UI-agnostic (no navigation/widget code inside)
+- Prefer Riverpod-native DI; if GetIt exists, bridge via thin providers and plan deprecation
+
+### Dependency Injection
+
+- Define a provider for each dependency; avoid global singletons
+- Register dependencies by feature in `providers.dart` files
+- Use `Provider` for pure objects, `StateNotifierProvider`/`AsyncNotifierProvider` for controllers
+- Use `autoDispose` for short-lived providers; add `keepAlive` only when it improves UX
+- Create proper abstractions that can be easily mocked for testing
+
+### MVVM Pattern with Riverpod
+
+The **Model-View-ViewModel (MVVM)** architecture pattern is naturally implemented with Riverpod:
+
+- **Model**: Domain entities and data models (DTOs) from Domain/Data layers
+- **View**: `ConsumerWidget` or `ConsumerStatefulWidget` - UI components that display data
+- **ViewModel**: `StateNotifier` or `AsyncNotifier` - manages state and business logic
+
+**Key Mapping:**
+
+- `StateNotifier`/`AsyncNotifier` = **ViewModel** (handles business logic and state)
+- `ConsumerWidget`/`ConsumerStatefulWidget` = **View** (displays UI based on state)
+- Entities/Models (Domain/Data) = **Model** (data structures)
+
+**Note on Terminology:**
+
+- In this codebase, we use "controllers" and "viewmodels" interchangeably
+- Both refer to `StateNotifier`/`AsyncNotifier` classes that act as ViewModels
+- The folder structure may use `controllers/` or `viewmodels/` - both are valid
+
+**MVVM Responsibilities:**
+
+1. **Model (Domain/Data Layer)**:
+
+   - Entities: Immutable domain objects representing business concepts
+   - DTOs: Data transfer objects for API communication
+   - Repository interfaces: Define data access contracts
+
+2. **ViewModel (Presentation Layer - StateNotifier/AsyncNotifier)**:
+
+   - Manages UI state using Freezed union types
+   - Contains business logic for the feature
+   - Calls use cases to interact with domain layer
+   - Never contains UI code (no widgets, navigation, or BuildContext)
+   - Emits state changes that the View observes
+
+3. **View (Presentation Layer - ConsumerWidget)**:
+   - Displays UI based on ViewModel state
+   - Listens to user interactions and calls ViewModel methods
+   - Uses `ref.watch` to observe state changes
+   - Uses `ref.listen` for side effects (navigation, snackbars)
+   - Keeps UI logic minimal - delegates to ViewModel
+
+**MVVM Flow:**
+
+```
+User Action → View → ViewModel → UseCase → Repository → DataSource
+                                                      ↓
+User Sees UI ← View ← ViewModel State ← UseCase ← Repository
+```
+
+### MVVM Best Practices
+
+**1. Separation of Concerns:**
+
+- **View**: Only UI rendering and user interaction handling
+- **ViewModel**: Business logic, state management, use case orchestration
+- **Model**: Data structures and domain logic
+- Never mix UI code (widgets, navigation) in ViewModel
+- Never put business logic in View
+
+**2. Using `ref.watch` vs `ref.read` vs `ref.select`:**
+
+- **`ref.watch`**: Use for values that should trigger UI rebuilds when they change
+
+  ```dart
+  // ✅ Correct: Watching state to rebuild UI
+  final state = ref.watch(userViewModelProvider);
+  ```
+
+- **`ref.read`**: Use for one-time reads or actions that don't require UI updates
+
+  ```dart
+  // ✅ Correct: One-time action, no rebuild needed
+  onPressed: () => ref.read(userViewModelProvider.notifier).refreshUser()
+  ```
+
+- **`ref.select`**: Use to watch only specific parts of state, reducing rebuilds
+  ```dart
+  // ✅ Correct: Only rebuilds when isLoading changes, not on other state changes
+  final isLoading = ref.watch(userViewModelProvider.select((state) => state.isLoading));
+  ```
+
+**3. Using `ref.listen` for Side Effects:**
+
+- Use `ref.listen` for one-off side effects that don't cause UI rebuilds
+- Perfect for navigation, snackbars, dialogs, analytics
+- Place in `build` method or use `ref.listen` in lifecycle methods
+
+```dart
+// ✅ Correct: Listen for side effects (navigation, snackbars)
+ref.listen<UserState>(userViewModelProvider, (previous, next) {
+  next.maybeWhen(
+    error: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(failure.message)),
+    ),
+    loaded: (user) => context.go('/home'), // Navigate on success
+    orElse: () {},
+  );
+});
+```
+
+**4. Using `.autoDispose` for Resource Management:**
+
+- Use `.autoDispose` for ViewModels tied to specific screens
+- Automatically disposes state when no longer needed
+- Prevents memory leaks and unnecessary state retention
+
+```dart
+// ✅ Correct: Auto-dispose when screen is removed
+final userViewModelProvider = StateNotifierProvider.autoDispose<UserViewModel, UserState>(
+  (ref) => UserViewModel(getUser: ref.read(getUserProvider)),
+);
+```
+
+**5. ViewModel State Management:**
+
+- Always use immutable state (Freezed union types)
+- Emit new state instances, never mutate existing state
+- Keep state classes focused and small
+- Use union types for clear state representation (initial, loading, success, error)
+
+**6. Provider Organization:**
+
+- Group related providers in feature-specific files (e.g., `auth_providers.dart`)
+- Name providers clearly: `userViewModelProvider`, `authViewModelProvider`
+- Use `.family` for parameterized ViewModels
+- Keep provider definitions close to their ViewModels
+
+**7. ViewModel Lifecycle:**
+
+- Initialize data in ViewModel constructor or dedicated `init()` method
+- Use `ref.onDispose` for cleanup (canceling timers, closing streams)
+- Avoid initializing in View - delegate to ViewModel
+
+```dart
+class UserViewModel extends StateNotifier<UserState> {
+  UserViewModel(this.getUser) : super(const UserState.initial()) {
+    // ✅ Initialize in constructor
+    loadUser();
+  }
+}
+```
+
+## Coding Standards
+
+### State Management
+
+- States are immutable using **Freezed**
+- Use union types for state representation (initial, loading, success, error)
+- Emit typed error states carrying `Failure` details
+- Keep state classes small and focused
+- Handle side effects with `ref.listen` in the UI
+- Prefer `ref.watch.select` to optimize rebuilds
+
+### Error Handling
+
+- Use `Either<Failure, Success>` (Dartz) for functional error handling at domain boundaries
+- Create custom `Failure` classes for domain-specific errors
+- Map exceptions to failures in data layer; never leak raw exceptions to presentation
+- Centralize error mapping strategies in `core/error`
+- Provide user-friendly error messages
+- Log errors in infrastructure layer
+
+#### Dartz Error Handling
+
+```
+abstract class Failure {
+  final String message;
+  const Failure(this.message);
+}
+
+class ServerFailure extends Failure { const ServerFailure([String m = 'Server error occurred']) : super(m); }
+class CacheFailure  extends Failure { const CacheFailure([String m = 'Cache error occurred']) : super(m); }
+class NetworkFailure extends Failure { const NetworkFailure([String m = 'Network error occurred']) : super(m); }
+class ValidationFailure extends Failure { const ValidationFailure([String m = 'Validation failed']) : super(m); }
+
+extension EitherX<L, R> on Either<L, R> {
+  R getRight() => (this as Right<L, R>).value;
+  L getLeft() => (this as Left<L, R>).value;
+  T foldMap<T>({required T Function(L) failure, required T Function(R) success}) => fold(failure, success);
+  Either<L, T> flatMap<T>(Either<L, T> Function(R r) f) => fold((l) => Left(l), f);
+}
+```
+
+### Repository Pattern
+
+- Repositories act as a single source of truth for data
+- Implement caching strategies when appropriate
+- Gracefully handle connectivity issues (e.g., fallback to cache)
+- Map data models (DTOs) to domain entities
+- Define clear method signatures on interfaces in domain layer
+- Implement pagination and data fetching logic in repositories/use cases
+
+### Testing Strategy
+
+- Unit-test domain logic, repositories, and controllers
+- Integration-test feature wiring (repository + data sources)
+- Widget-test key UI components
+- Use mocktail/mockito for doubles
+- Follow Given-When-Then (or Arrange-Act-Assert) structure
+- Favor deterministic tests (no global state, no time-dependent flakiness)
+
+#### Unit Testing with Riverpod (MVVM Examples)
+
+**Testing ViewModel (StateNotifier) with Provider Overrides:**
+
+```dart
+// pubspec.yaml (dev_dependencies):
+// flutter_test, mocktail, freezed, build_runner, riverpod, flutter_riverpod, dartz
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dartz/dartz.dart';
+
+// Mock use case
+class FakeGetUser extends Mock implements GetUser {}
+
+void main() {
+  late ProviderContainer container;
+  late FakeGetUser fakeGetUser;
+
+  setUp(() {
+    fakeGetUser = FakeGetUser();
+    container = ProviderContainer(overrides: [
+      getUserProvider.overrideWithValue(fakeGetUser),
+      userViewModelProvider.overrideWith((ref, String id) {
+        return UserViewModel(getUser: ref.read(getUserProvider));
+      }),
+    ]);
+    addTearDown(container.dispose);
+  });
+
+  group('UserViewModel Tests', () {
+    test('initial state is UserState.initial', () {
+      final state = container.read(userViewModelProvider('42'));
+      expect(state, isA<UserStateInitial>());
+    });
+
+    test('emits loading -> loaded when GetUser succeeds', () async {
+      // Arrange
+      when(() => fakeGetUser.call('42')).thenAnswer(
+        (_) async => Right(User(id: '42', name: 'John', email: 'john@example.com')),
+      );
+
+      // Act
+      await container.read(userViewModelProvider('42').notifier).fetchUser('42');
+
+      // Assert
+      final state = container.read(userViewModelProvider('42'));
+      expect(state, isA<UserStateLoaded>());
+      state.maybeWhen(
+        loaded: (user) {
+          expect(user.id, '42');
+          expect(user.name, 'John');
+        },
+        orElse: () => fail('Expected loaded state'),
+      );
+    });
+
+    test('emits loading -> error when GetUser fails', () async {
+      // Arrange
+      final failure = ServerFailure('Network error');
+      when(() => fakeGetUser.call('42')).thenAnswer(
+        (_) async => Left(failure),
+      );
+
+      // Act
+      await container.read(userViewModelProvider('42').notifier).fetchUser('42');
+
+      // Assert
+      final state = container.read(userViewModelProvider('42'));
+      expect(state, isA<UserStateError>());
+      state.maybeWhen(
+        error: (f) => expect(f.message, 'Network error'),
+        orElse: () => fail('Expected error state'),
+      );
+    });
+
+    test('refreshUser calls fetchUser with current userId', () async {
+      // Arrange
+      when(() => fakeGetUser.call('42')).thenAnswer(
+        (_) async => Right(User(id: '42', name: 'John', email: 'john@example.com')),
+      );
+
+      // Act
+      final notifier = container.read(userViewModelProvider('42').notifier);
+      await notifier.fetchUser('42');
+      await notifier.refreshUser();
+
+      // Assert
+      verify(() => fakeGetUser.call('42')).called(2);
+    });
+  });
+}
+```
+
+**Testing ViewModel with State Transitions:**
+
+```dart
+test('ViewModel state transitions correctly', () async {
+  when(() => fakeGetUser.call('42')).thenAnswer(
+    (_) async => Right(User(id: '42', name: 'John', email: 'john@example.com')),
+  );
+
+  final notifier = container.read(userViewModelProvider('42').notifier);
+  final states = <UserState>[];
+
+  // Listen to state changes
+  container.listen(userViewModelProvider('42'), (previous, next) {
+    states.add(next);
+  });
+
+  // Trigger state change
+  await notifier.fetchUser('42');
+
+  // Verify state transitions
+  expect(states.length, greaterThanOrEqualTo(2));
+  expect(states.first, isA<UserStateLoading>());
+  expect(states.last, isA<UserStateLoaded>());
+});
+```
+
+**Widget Test with ViewModel Override:**
+
+```dart
+void main() {
+  testWidgets('View displays user details after ViewModel loads', (tester) async {
+    // Arrange: Create fake use case that succeeds
+    final fakeGetUser = FakeGetUser();
+    when(() => fakeGetUser.call('7')).thenAnswer(
+      (_) async => Right(User(id: '7', name: 'Jane', email: 'jane@example.com')),
+    );
+
+    // Act: Build widget with provider override
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          getUserProvider.overrideWithValue(fakeGetUser),
+        ],
+        child: const MaterialApp(home: UserPage(userId: '7')),
+      ),
+    );
+
+    // Wait for async operations
+    await tester.pumpAndSettle();
+
+    // Assert: Verify UI displays user data
+    expect(find.text('User Details'), findsOneWidget);
+    expect(find.text('Jane'), findsOneWidget);
+    expect(find.text('jane@example.com'), findsOneWidget);
+  });
+
+  testWidgets('View shows error message when ViewModel fails', (tester) async {
+    // Arrange: Create fake use case that fails
+    final fakeGetUser = FakeGetUser();
+    when(() => fakeGetUser.call('7')).thenAnswer(
+      (_) async => const Left(ServerFailure('Failed to load user')),
+    );
+
+    // Act
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          getUserProvider.overrideWithValue(fakeGetUser),
+        ],
+        child: const MaterialApp(home: UserPage(userId: '7')),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Assert: Verify error UI is displayed
+    expect(find.text('Failed to load user'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+  });
+}
+```
+
+**Testing AsyncNotifier ViewModel:**
+
+```dart
+class FakeGetUser extends Mock implements GetUser {}
+
+void main() {
+  late ProviderContainer container;
+  late FakeGetUser fakeGetUser;
+
+  setUp(() {
+    fakeGetUser = FakeGetUser();
+    container = ProviderContainer(overrides: [
+      getUserProvider.overrideWithValue(fakeGetUser),
+    ]);
+    addTearDown(container.dispose);
+  });
+
+  test('AsyncNotifier ViewModel loads user successfully', () async {
+    // Arrange
+    when(() => fakeGetUser.call('42')).thenAnswer(
+      (_) async => Right(User(id: '42', name: 'John', email: 'john@example.com')),
+    );
+
+    // Act: Wait for ViewModel to build
+    final userAsync = await container.read(userViewModelProvider.future);
+
+    // Assert
+    expect(userAsync.id, '42');
+    expect(userAsync.name, 'John');
+  });
+
+  test('AsyncNotifier ViewModel handles errors', () async {
+    // Arrange
+    when(() => fakeGetUser.call('42')).thenAnswer(
+      (_) async => const Left(ServerFailure('Error')),
+    );
+
+    // Act & Assert
+    expect(
+      () => container.read(userViewModelProvider.future),
+      throwsA(isA<ServerFailure>()),
+    );
+  });
+}
+```
+
+### Performance Optimization
+
+**1. Minimize Rebuilds with `ref.watch.select`:**
+
+- Use `ref.watch.select` to watch only specific parts of state
+- Prevents unnecessary rebuilds when unrelated state changes
+- Essential for large state objects or complex ViewModels
+
+```dart
+// ❌ Bad: Rebuilds on any state change
+final state = ref.watch(userViewModelProvider);
+
+// ✅ Good: Only rebuilds when isLoading changes
+final isLoading = ref.watch(
+  userViewModelProvider.select((state) => state.isLoading),
+);
+
+// ✅ Good: Only rebuilds when user name changes
+final userName = ref.watch(
+  userViewModelProvider.select((state) => state.maybeWhen(
+    loaded: (user) => user.name,
+    orElse: () => null,
+  )),
+);
+```
+
+**2. Use `ref.read` for Actions:**
+
+- Use `ref.read` for one-time actions that don't need UI updates
+- Prevents unnecessary rebuilds when calling ViewModel methods
+
+```dart
+// ✅ Correct: No rebuild needed for action
+onPressed: () => ref.read(userViewModelProvider.notifier).refreshUser()
+```
+
+**3. Const Constructors:**
+
+- Always use `const` constructors for immutable widgets
+- Reduces widget rebuild overhead
+
+```dart
+// ✅ Good: Const constructor
+const UserDetailsWidget({required this.user});
+
+// ❌ Bad: Non-const constructor
+UserDetailsWidget({required this.user});
+```
+
+**4. List Rendering:**
+
+- Use `ListView.builder` or `SliverList` for long lists
+- Lazy loading reduces memory usage
+
+```dart
+// ✅ Good: Lazy loading
+ListView.builder(
+  itemCount: users.length,
+  itemBuilder: (context, index) => UserTile(user: users[index]),
+)
+```
+
+**5. AutoDispose for Screen-Scoped ViewModels:**
+
+- Use `.autoDispose` for ViewModels tied to specific screens
+- Automatically cleans up when screen is removed
+- Prevents memory leaks and unnecessary state retention
+
+```dart
+// ✅ Good: Auto-dispose when screen removed
+final userViewModelProvider = StateNotifierProvider.autoDispose<UserViewModel, UserState>(
+  (ref) => UserViewModel(getUser: ref.read(getUserProvider)),
+);
+```
+
+**6. Heavy Computation:**
+
+- Use `compute()` or isolates for CPU-intensive work
+- Keeps UI thread responsive
+
+```dart
+// ✅ Good: Heavy computation in isolate
+final result = await compute(heavyComputation, data);
+```
+
+**7. Pagination:**
+
+- Implement pagination for large data sets
+- Load data incrementally to reduce memory usage
+
+**8. Caching:**
+
+- Cache resources with appropriate TTL
+- Reduces network calls and improves performance
+
+**9. Profiling:**
+
+- Use Flutter DevTools to profile performance
+- Identify bottlenecks and optimize accordingly
+- Monitor rebuild frequency and widget tree depth
+
+### Code Quality
+
+- Use `flutter_lints` or `very_good_analysis`
+- Keep functions small and focused (~20 statements)
+- Apply SOLID principles across codebase
+- Use meaningful naming; document public APIs and complex logic
+- Enforce null-safety; avoid `dynamic`
+- Use value objects for domain-specific types
+
+## Implementation Examples
+
+### Use Case Implementation
+
+```
+abstract class UseCase<Type, Params> {
+  Future<Either<Failure, Type>> call(Params params);
+}
+
+class GetUser implements UseCase<User, String> {
+  final UserRepository repository;
+  const GetUser(this.repository);
+
+  @override
+  Future<Either<Failure, User>> call(String userId) => repository.getUser(userId);
+}
+```
+
+### Repository Implementation
+
+```
+abstract class UserRepository {
+  Future<Either<Failure, User>> getUser(String id);
+  Future<Either<Failure, List<User>>> getUsers();
+  Future<Either<Failure, Unit>> saveUser(User user);
+}
+
+class UserRepositoryImpl implements UserRepository {
+  final UserRemoteDataSource remoteDataSource;
+  final UserLocalDataSource localDataSource;
+  final NetworkInfo networkInfo;
+
+  const UserRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+    required this.networkInfo,
+  });
+
+  @override
+  Future<Either<Failure, User>> getUser(String id) async {
+    final bool connected = await networkInfo.isConnected;
+    if (!connected) {
+      try {
+        final dto = await localDataSource.getLastUser();
+        return Right(dto.toDomain());
+      } catch (_) {
+        return const Left(CacheFailure());
+      }
+    }
+    try {
+      final dto = await remoteDataSource.getUser(id);
+      await localDataSource.cacheUser(dto);
+      return Right(dto.toDomain());
+    } catch (_) {
+      return const Left(ServerFailure());
+    }
+  }
+}
+```
+
+### MVVM Example: ViewModel (StateNotifier + Freezed)
+
+**Model (Domain Entity):**
+
+```dart
+// Domain entity - immutable business object
+class User {
+  final String id;
+  final String name;
+  final String email;
+
+  const User({required this.id, required this.name, required this.email});
+}
+```
+
+**ViewModel State (Freezed Union):**
+
+```dart
+@freezed
+class UserState with _$UserState {
+  const factory UserState.initial() = _Initial;
+  const factory UserState.loading() = _Loading;
+  const factory UserState.loaded(User user) = _Loaded;
+  const factory UserState.error(Failure failure) = _Error;
+}
+```
+
+**ViewModel (StateNotifier):**
+
+```dart
+// ViewModel: Manages state and business logic
+// Note: "Controller" and "ViewModel" are interchangeable terms
+class UserViewModel extends StateNotifier<UserState> {
+  final GetUser getUser; // Use case dependency
+  String? _currentUserId;
+
+  UserViewModel({required this.getUser}) : super(const UserState.initial());
+
+  // Business logic: Fetch user data
+  Future<void> fetchUser(String id) async {
+    _currentUserId = id;
+    state = const UserState.loading();
+
+    final result = await getUser(id);
+    state = result.fold(
+      (failure) => UserState.error(failure),
+      (user) => UserState.loaded(user),
+    );
+  }
+
+  // Business logic: Refresh user data
+  Future<void> refreshUser() async {
+    final id = _currentUserId;
+    if (id == null) return;
+    await fetchUser(id);
+  }
+}
+
+// Provider: Exposes ViewModel to View
+final userViewModelProvider = StateNotifierProvider.autoDispose.family<UserViewModel, UserState, String>(
+  (ref, userId) {
+    final getUser = ref.read(getUserProvider);
+    return UserViewModel(getUser: getUser)..fetchUser(userId);
+  },
+);
+```
+
+**Alternative: Using AsyncNotifier (for async-heavy ViewModels):**
+
+```dart
+// ViewModel using AsyncNotifier for simpler async flows
+class UserViewModel extends AsyncNotifier<User> {
+  @override
+  Future<User> build() async {
+    final userId = ref.watch(userIdProvider);
+    final getUser = ref.read(getUserProvider);
+    final result = await getUser(userId);
+    return result.fold(
+      (failure) => throw failure,
+      (user) => user,
+    );
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final userId = ref.read(userIdProvider);
+      final getUser = ref.read(getUserProvider);
+      final result = await getUser(userId);
+      return result.fold((f) => throw f, (u) => u);
+    });
+  }
+}
+
+final userViewModelProvider = AsyncNotifierProvider.autoDispose<UserViewModel, User>(
+  () => UserViewModel(),
+);
+```
+
+### MVVM Example: View (ConsumerWidget)
+
+**Complete MVVM Implementation:**
+
+```dart
+// View: Displays UI based on ViewModel state
+// Uses ref.watch to observe state, ref.read for actions, ref.listen for side effects
+class UserPage extends ConsumerWidget {
+  final String userId;
+  const UserPage({super.key, required this.userId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch ViewModel state - triggers rebuild on state changes
+    final state = ref.watch(userViewModelProvider(userId));
+
+    // Listen for side effects (snackbars, navigation) - doesn't trigger rebuild
+    ref.listen<UserState>(userViewModelProvider(userId), (previous, next) {
+      next.maybeWhen(
+        error: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        ),
+        loaded: (user) {
+          // Optional: Navigate on success
+          // context.go('/user-details');
+        },
+        orElse: () {},
+      );
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('User Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            // Read ViewModel for one-time action - no rebuild needed
+            onPressed: () => ref.read(userViewModelProvider(userId).notifier).refreshUser(),
+          ),
+        ],
+      ),
+      body: state.when(
+        initial: () => const SizedBox.shrink(),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        loaded: (user) => UserDetailsWidget(user: user), // Display user data
+        error: (failure) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(failure.message),
+              ElevatedButton(
+                onPressed: () => ref.read(userViewModelProvider(userId).notifier).fetchUser(userId),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+**Optimized View with `ref.select` (Performance):**
+
+```dart
+// Optimized: Only rebuilds when specific state parts change
+class UserPageOptimized extends ConsumerWidget {
+  final String userId;
+  const UserPageOptimized({super.key, required this.userId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Select only isLoading - widget rebuilds only when loading state changes
+    final isLoading = ref.watch(
+      userViewModelProvider(userId).select((state) => state.maybeWhen(
+        loading: () => true,
+        orElse: () => false,
+      )),
+    );
+
+    // Select only user data - widget rebuilds only when user changes
+    final user = ref.watch(
+      userViewModelProvider(userId).select((state) => state.maybeWhen(
+        loaded: (user) => user,
+        orElse: () => null,
+      )),
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('User Details')),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : user != null
+              ? UserDetailsWidget(user: user)
+              : const Center(child: Text('No user data')),
+    );
+  }
+}
+```
+
+**Alternative: Using AsyncNotifier ViewModel:**
+
+```dart
+// View with AsyncNotifier ViewModel
+class UserPageAsync extends ConsumerWidget {
+  final String userId;
+  const UserPageAsync({super.key, required this.userId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(userViewModelProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('User Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.read(userViewModelProvider.notifier).refresh(),
+          ),
+        ],
+      ),
+      body: userAsync.when(
+        data: (user) => UserDetailsWidget(user: user),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $error'),
+              ElevatedButton(
+                onPressed: () => ref.read(userViewModelProvider.notifier).refresh(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Dependency Registration (Providers Graph)
+
+```
+// Core services / clients
+final dioProvider = Provider<Dio>((ref) => Dio());
+final networkInfoProvider = Provider<NetworkInfo>((ref) => NetworkInfoImpl());
+final sharedPrefsProvider = Provider<SharedPreferences>((ref) => throw UnimplementedError());
+
+// Data sources
+final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>(
+  (ref) => UserRemoteDataSourceImpl(client: ref.read(dioProvider)),
+);
+final userLocalDataSourceProvider = Provider<UserLocalDataSource>(
+  (ref) => UserLocalDataSourceImpl(sharedPreferences: ref.read(sharedPrefsProvider)),
+);
+
+// Repository
+final userRepositoryProvider = Provider<UserRepository>(
+  (ref) => UserRepositoryImpl(
+    remoteDataSource: ref.read(userRemoteDataSourceProvider),
+    localDataSource: ref.read(userLocalDataSourceProvider),
+    networkInfo: ref.read(networkInfoProvider),
+  ),
+);
+
+// Use cases
+final getUserProvider = Provider<GetUser>(
+  (ref) => GetUser(ref.read(userRepositoryProvider)),
+);
+```
+
+## CI/CD with Firebase App Distribution
+
+### GitHub Actions Workflow (`.github/workflows/cicd.yml`)
+
+- Caches Flutter & pub
+- Uploads to **Firebase App Distribution**
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: |
+          flutter build apk
+
+      - name: Upload to Firebase App Distribution (Dev)
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: dev-testers
+          file: build/app/outputs/flutter-apk/app-dev-release.apk
+          releaseNotes: "Dev build from ${{ github.sha }}"
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - name: Install Cocoapods
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Build iOS
+        run: |
+          flutter build ipa
+
+      - name: Upload to Firebase App Distribution (Dev)
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_IOS_APP_ID_DEV }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: dev-testers
+          file: build/ios/ipa/*.ipa
+          releaseNotes: "iOS Dev build from ${{ github.sha }}"
+```
+
+**Secrets required**
+
+- `FIREBASE_SERVICE_ACCOUNT_JSON` — contents of the Firebase service account key JSON
+- `FIREBASE_ANDROID_APP_ID_DEV`, `FIREBASE_IOS_APP_ID_DEV` — the App IDs from Firebase console
+- (Optionally for staging/prod) `FIREBASE_ANDROID_APP_ID_STG`, `FIREBASE_IOS_APP_ID_STG`, etc.
+
+**Notes**
+
+- For Android signing, add keystore secrets and use `gradle.properties` envs if distributing signed releases.
+- For iOS, ensure proper signing with App Store Connect API keys or use manual signing on the runner (Fastlane match is recommended for teams).
+
+### Fastlane (Optional, alternative to the GitHub Action)
+
+You can also use `fastlane` to upload to Firebase App Distribution:
+
+```
+# ios/fastlane/Fastfile
+lane :dev do
+  build_app(
+    scheme: "MyApp-Dev",
+    export_options: "ExportOptions-dev.plist"
+  )
+  firebase_app_distribution(
+    app: ENV["FIREBASE_IOS_APP_ID_DEV"],
+    firebase_cli_token: ENV["FIREBASE_TOKEN"],
+    groups: "dev-testers",
+    ipa_path: "build/ios/ipa/MyApp.ipa",
+    release_notes: "iOS Dev build"
+  )
+end
+```
+
+## Checklist (per feature - MVVM Pattern)
+
+**Model Layer:**
+
+1. **Entities**: immutable domain objects (Model in MVVM)
+2. **Repository interface** in domain; **impl** in data
+3. **Use cases**: single responsibility, return `Either<Failure, T>`
+
+**ViewModel Layer:** 4. **ViewModel/Controller**: StateNotifier/AsyncNotifier manages state and business logic
+
+- Uses Freezed union types for state (initial, loading, loaded, error)
+- Contains business logic, calls use cases
+- Never contains UI code (no widgets, navigation, BuildContext)
+- Uses `.autoDispose` for screen-scoped ViewModels
+
+**View Layer:** 5. **View**: ConsumerWidget/ConsumerStatefulWidget displays UI
+
+- Uses `ref.watch` to observe ViewModel state
+- Uses `ref.read` for one-time actions
+- Uses `ref.select` to optimize rebuilds (watch specific state parts)
+- Uses `ref.listen` for side effects (navigation, snackbars)
+- Keeps UI logic minimal - delegates to ViewModel
+
+**Dependency Injection:** 6. **Providers**: services → datasources → repo → use cases → ViewModels
+
+- Group providers by feature (e.g., `auth_providers.dart`)
+- Use `.family` for parameterized ViewModels
+- Use `Provider` for services, `StateNotifierProvider`/`AsyncNotifierProvider` for ViewModels
+
+**Error Handling:** 7. **Errors**: exceptions → failures mapping; friendly messages
+
+- Map exceptions to failures in data layer
+- Never leak raw exceptions to presentation
+- Provide user-friendly error messages
+
+**Testing:** 8. **Tests**:
+
+- Domain: unit tests for use cases & entities
+- Data: mock data sources, verify mapping
+- ViewModel: test state transitions with provider overrides
+- View: widget tests with provider overrides
+
+**Configuration:** 9. **CI/CD**: workflow builds & uploads to Firebase App Distribution
+
+---
+
+Refer to official Flutter, Riverpod, and Firebase documentation for deeper configuration details.
+
+---
+
+---
+
+description:
+globs:
+alwaysApply: false
+
+---
+
+You are an expert Flutter developer specializing in Clean Architecture with Feature-first organization and **Riverpod** for state management.
+
+> This document extends the previous rule with **unit testing** and **CI/CD** using **GitHub Actions**, ensuring **Firebase App Distribution happens only when pushing to the `production` branch**. It also clarifies the branch strategy: **production**, **main** (integration), and **development** (feature branches).
+
+## Branch Strategy
+
+- **production**: Protected release branch. Only tested, reviewed code is merged here (PRs required). **Distributes** to Firebase App Distribution.
+- **main**: Integration/staging branch. Merge PRs frequently. Runs full checks and produces artifacts but **does not distribute**.
+- **development (feature branches)**: Named `feature/<something>`. Runs checks and produces artifacts for quick QA; **no distribution**.
+
+## Unit Testing (Quick Guidance)
+
+- **Domain**: pure unit tests for use cases & entities (Given–When–Then).
+- **Data**: mock data sources; verify mapping and error conversion (exceptions → Failures).
+- **ViewModels**: test `StateNotifier/AsyncNotifier` transitions with provider overrides.
+  - Test state transitions (initial → loading → loaded/error)
+  - Test business logic methods
+  - Verify use case calls and error handling
+- **Views**: test critical screens with provider overrides and golden tests.
+  - Test UI rendering based on ViewModel state
+  - Test user interactions trigger ViewModel methods
+  - Test side effects (navigation, snackbars) with `ref.listen`
+- Keep tests deterministic: **no global state**, **fixed clocks** if needed, and **mock I/O**.
+
+Example (ViewModel state transition):
+
+```dart
+class FakeGetUser extends Mock implements GetUser {}
+
+void main() {
+  late ProviderContainer container;
+  late FakeGetUser fakeGetUser;
+
+  setUp(() {
+    fakeGetUser = FakeGetUser();
+    container = ProviderContainer(overrides: [
+      getUserProvider.overrideWithValue(fakeGetUser),
+      userViewModelProvider.overrideWith((ref, String id) => UserViewModel(getUser: ref.read(getUserProvider))),
+    ]);
+    addTearDown(container.dispose);
+  });
+
+  test('ViewModel emits loading -> loaded when success', () async {
+    when(() => fakeGetUser('42')).thenAnswer((_) async => Right(User(id: '42', name: 'Neo')));
+    final viewModel = container.read(userViewModelProvider('42').notifier);
+    await viewModel.fetchUser('42');
+    final state = container.read(userViewModelProvider('42'));
+    state.map(
+      initial: (_) => fail('not expected'),
+      loading: (_) => fail('not expected'),
+      loaded: (s) => expect(s.user.id, '42'),
+      error: (_) => fail('not expected'),
+    );
+  });
+}
+```
+
+## GitHub Actions CI/CD (Distribute only on `production`)
+
+- Runs on pushes to **production**, **main**, and **feature/** branches; on PRs to **main**.
+- **Analyze → Test → Build** for all branches.
+- **Distribute to Firebase App Distribution only when branch == `production`**.
+- Upload APK/IPA artifacts to GitHub for **all** branches (for manual QA).
+
+Create `.github/workflows/cicd.yaml`:
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - production
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+env:
+  FLUTTER_VERSION: "3.24.0"
+
+jobs:
+  analyze_test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code (freezed/json)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+
+  build_android:
+    name: Build Android (apk/aab)
+    runs-on: ubuntu-latest
+    needs: analyze_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Determine distribution
+        id: meta
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == "refs/heads/production" ]]; then
+            echo "distribute=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "distribute=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build APK
+        run: |
+          flutter build apk
+
+      - name: Build AAB (Play-ready, optional)
+        run: |
+          flutter build appbundle
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/**/app-*.aab
+
+      - name: Distribute to Firebase App Distribution (Android)
+        if: ${{ steps.meta.outputs.distribute == 'true' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: production-testers
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "Android build from ${{ github.sha }}"
+
+  build_ios:
+    name: Build iOS (ipa)
+    runs-on: macos-latest
+    needs: analyze_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Determine distribution
+        id: meta
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == "refs/heads/production" ]]; then
+            echo "distribute=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "distribute=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Build iOS IPA
+        run: |
+          flutter build ipa
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios/ipa/*.ipa
+
+      - name: Distribute to Firebase App Distribution (iOS)
+        if: ${{ steps.meta.outputs.distribute == 'true' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: production-testers
+          file: build/ios/ipa/*.ipa
+          releaseNotes: "iOS build from ${{ github.sha }}"
+```
+
+### Required Secrets
+
+- `FIREBASE_SERVICE_ACCOUNT_JSON` — JSON contents of a Firebase service account with App Distribution access.
+- `FIREBASE_ANDROID_APP_ID` — Firebase Android App ID.
+- `FIREBASE_IOS_APP_ID` — Firebase iOS App ID.
+- (Optional) Signing secrets: Android keystore creds, iOS signing or App Store Connect API key.
+
+## Summary of Behavior
+
+- **production** push → build **+ distribute** to Firebase App Distribution.
+- **main** push/PR → build, **no distribution**, artifacts uploaded.
+- **feature/** push/PR → build, **no distribution**, artifacts uploaded.
+- All branches: static analysis, code generation, tests, and artifacts.
+
+---
+
+> Keep your **Riverpod Clean Architecture** rules from the previous doc. This file adds your **branching, testing, and CI/CD** policy in one place.

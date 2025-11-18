@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "630655130276",
+    "project_id": "parking-35bad",
+    "storage_bucket": "parking-35bad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630655130276:android:b3590c4c62a91ffc47a431",
+        "android_client_info": {
+          "package_name": "com.example.tec_parking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtommlHG6VukpgDhWICP67NfvIP4Q8CPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630655130276:android:4c8f2b148047d17047a431",
+        "android_client_info": {
+          "package_name": "com.example.tec_parking.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtommlHG6VukpgDhWICP67NfvIP4Q8CPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630655130276:android:ee3ffb8daf31a41d47a431",
+        "android_client_info": {
+          "package_name": "com.example.tec_parking.stg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtommlHG6VukpgDhWICP67NfvIP4Q8CPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630655130276:android:edf4977dd4b65c7147a431",
+        "android_client_info": {
+          "package_name": "com.teckpart.parkingtec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtommlHG6VukpgDhWICP67NfvIP4Q8CPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
