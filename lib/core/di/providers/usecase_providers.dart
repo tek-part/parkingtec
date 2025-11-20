@@ -17,6 +17,7 @@ import 'package:parkingtec/features/invoice/domain/usecases/pay_invoice_usecase.
 import 'package:parkingtec/features/invoice/domain/usecases/pickup_invoice_usecase.dart';
 import 'package:parkingtec/features/invoice/domain/usecases/scan_invoice_usecase.dart';
 import 'package:parkingtec/features/invoice/domain/usecases/search_invoices_usecase.dart';
+import 'package:parkingtec/features/printing/providers/printing_providers.dart' as printing_providers;
 
 /// Use Case Providers
 
@@ -106,3 +107,11 @@ final scanInvoiceUseCaseProvider = Provider<ScanInvoiceUseCase>((ref) {
 final searchInvoicesUseCaseProvider = Provider<SearchInvoicesUseCase>((ref) {
   return SearchInvoicesUseCase(ref.read(invoiceRepositoryProvider));
 });
+
+/// Printing Use Case Providers
+/// Re-exported from printing_providers.dart for convenience
+final printInvoiceOnCreateUseCaseProvider = printing_providers.printInvoiceOnCreateUseCaseProvider;
+
+final printInvoiceOnCompleteUseCaseProvider = printing_providers.printInvoiceOnCompleteUseCaseProvider;
+
+final reprintInvoiceUseCaseProvider = printing_providers.reprintInvoiceUseCaseProvider;

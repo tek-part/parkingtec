@@ -84,7 +84,7 @@ class InvoicePaymentStatusWidget extends ConsumerWidget {
                   ),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: AppColors.primaryX(context),
                       ),
                 ),
             ],

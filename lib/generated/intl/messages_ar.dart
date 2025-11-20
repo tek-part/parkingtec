@@ -20,9 +20,11 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ar';
 
-  static String m0(amount) => "سيتم إنهاء الجلسة اليومية برصيد ${amount}";
+  static String m0(deviceName) => "متصل بـ ${deviceName}";
 
-  static String m1(error) => "فشل تسجيل الدخول: ${error}";
+  static String m1(amount) => "سيتم إنهاء الجلسة اليومية برصيد ${amount}";
+
+  static String m2(error) => "فشل تسجيل الدخول: ${error}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -35,7 +37,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "المبلغ المدخل لا يطابق المبلغ المطلوب",
     ),
     "amountRequired": MessageLookupByLibrary.simpleMessage("المبلغ مطلوب"),
-    "appConfig": MessageLookupByLibrary.simpleMessage("إعدادات التطبيق"),
+    "amountWillBeCalculated": MessageLookupByLibrary.simpleMessage(
+      "سيتم حساب المبلغ بناءً على سعر الساعة عند إكمال الفاتورة",
+    ),
+    "appConfig": MessageLookupByLibrary.simpleMessage("إعدادات التكوين"),
+    "appSettings": MessageLookupByLibrary.simpleMessage("إعدادات التطبيق"),
     "appSubtitle": MessageLookupByLibrary.simpleMessage("حلول الإيقاف الذكية"),
     "appTitle": MessageLookupByLibrary.simpleMessage("الوافي باركن"),
     "areYouSureLogout": MessageLookupByLibrary.simpleMessage(
@@ -48,11 +54,42 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "هل أنت متأكد من أنك تريد إنهاء اليومية؟",
         ),
+    "autoPrintOnComplete": MessageLookupByLibrary.simpleMessage(
+      "الطباعة التلقائية عند الإكمال",
+    ),
+    "autoPrintOnCompleteDesc": MessageLookupByLibrary.simpleMessage(
+      "طباعة إيصال الخروج تلقائياً عند إكمال الفاتورة",
+    ),
+    "autoPrintOnCreate": MessageLookupByLibrary.simpleMessage(
+      "الطباعة التلقائية عند الإنشاء",
+    ),
+    "autoPrintOnCreateDesc": MessageLookupByLibrary.simpleMessage(
+      "طباعة تذكرة الدخول تلقائياً عند إنشاء الفاتورة",
+    ),
+    "autoPrintOptions": MessageLookupByLibrary.simpleMessage(
+      "خيارات الطباعة التلقائية",
+    ),
+    "availableDevices": MessageLookupByLibrary.simpleMessage("الأجهزة المتاحة"),
     "barcodeEnabled": MessageLookupByLibrary.simpleMessage("تفعيل الباركود"),
+    "bluetoothPrintError": MessageLookupByLibrary.simpleMessage(
+      "خطأ في طباعة Bluetooth",
+    ),
+    "bluetoothPrinterNotConnected": MessageLookupByLibrary.simpleMessage(
+      "طابعة Bluetooth غير متصلة",
+    ),
+    "bluetoothTestPrintNotImplemented": MessageLookupByLibrary.simpleMessage(
+      "طباعة تجريبية Bluetooth - تنفيذ أوامر ESC/POS",
+    ),
     "cancel": MessageLookupByLibrary.simpleMessage("إلغاء"),
     "carColor": MessageLookupByLibrary.simpleMessage("لون السيارة"),
     "carModel": MessageLookupByLibrary.simpleMessage("موديل السيارة"),
+    "carModelOptional": MessageLookupByLibrary.simpleMessage(
+      "موديل السيارة (اختياري)",
+    ),
     "carNumber": MessageLookupByLibrary.simpleMessage("رقم السيارة"),
+    "carNumberRequired": MessageLookupByLibrary.simpleMessage(
+      "رقم السيارة مطلوب",
+    ),
     "carRequested": MessageLookupByLibrary.simpleMessage("تم طلب السيارة"),
     "clear": MessageLookupByLibrary.simpleMessage("مسح"),
     "clearHistory": MessageLookupByLibrary.simpleMessage("مسح التاريخ"),
@@ -73,12 +110,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "تأكيد إنهاء الجلسة",
     ),
     "confirmLogout": MessageLookupByLibrary.simpleMessage("تأكيد تسجيل الخروج"),
+    "connect": MessageLookupByLibrary.simpleMessage("اتصال"),
+    "connected": MessageLookupByLibrary.simpleMessage("متصل"),
+    "connectedDevice": MessageLookupByLibrary.simpleMessage("الجهاز المتصل"),
+    "connectedPrinter": MessageLookupByLibrary.simpleMessage("الطابعة المتصلة"),
+    "connectedPrinterShownAtTop": MessageLookupByLibrary.simpleMessage(
+      "الطابعة المتصلة معروضة في الأعلى",
+    ),
+    "connectedToDevice": m0,
+    "connectionFailed": MessageLookupByLibrary.simpleMessage("فشل الاتصال"),
+    "connectionStatus": MessageLookupByLibrary.simpleMessage("حالة الاتصال"),
+    "continueWithoutPrinting": MessageLookupByLibrary.simpleMessage(
+      "المتابعة بدون طباعة",
+    ),
     "create": MessageLookupByLibrary.simpleMessage("إنشاء"),
     "createInvoice": MessageLookupByLibrary.simpleMessage("إنشاء فاتورة"),
     "currency": MessageLookupByLibrary.simpleMessage("جنيه"),
     "currencySymbol": MessageLookupByLibrary.simpleMessage("رمز العملة"),
     "currentAmount": MessageLookupByLibrary.simpleMessage("المبلغ الحالي"),
     "customerName": MessageLookupByLibrary.simpleMessage("اسم العميل"),
+    "customerNameOptional": MessageLookupByLibrary.simpleMessage(
+      "اسم العميل (اختياري)",
+    ),
     "dailyAlreadyOpen": MessageLookupByLibrary.simpleMessage(
       "هناك يومية مفتوحة بالفعل",
     ),
@@ -88,6 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dailyTerminatedSuccess": MessageLookupByLibrary.simpleMessage(
       "تم إنهاء اليومية بنجاح",
     ),
+    "dark": MessageLookupByLibrary.simpleMessage("داكن"),
     "date": MessageLookupByLibrary.simpleMessage("التاريخ"),
     "defaultFixedPrice": MessageLookupByLibrary.simpleMessage(
       "السعر الثابت الافتراضي",
@@ -96,6 +150,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "سعر الساعة الافتراضي",
     ),
     "disabled": MessageLookupByLibrary.simpleMessage("معطل"),
+    "disconnect": MessageLookupByLibrary.simpleMessage("قطع الاتصال"),
+    "disconnected": MessageLookupByLibrary.simpleMessage("غير متصل"),
     "done": MessageLookupByLibrary.simpleMessage("تم"),
     "duration": MessageLookupByLibrary.simpleMessage("المدة"),
     "enabled": MessageLookupByLibrary.simpleMessage("مفعل"),
@@ -108,7 +164,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "endInvoice": MessageLookupByLibrary.simpleMessage("إنهاء الفاتورة"),
     "endSession": MessageLookupByLibrary.simpleMessage("إنهاء الجلسة"),
-    "endSessionConfirmationMessage": m0,
+    "endSessionConfirmationMessage": m1,
     "endSessionDialogTitle": MessageLookupByLibrary.simpleMessage(
       "إنهاء الجلسة اليومية",
     ),
@@ -138,11 +194,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "finalAmount": MessageLookupByLibrary.simpleMessage("المبلغ النهائي"),
     "findParking": MessageLookupByLibrary.simpleMessage("البحث عن موقف"),
     "fixedPricing": MessageLookupByLibrary.simpleMessage("ثابت"),
+    "goToSettings": MessageLookupByLibrary.simpleMessage(
+      "الذهاب إلى الإعدادات",
+    ),
     "history": MessageLookupByLibrary.simpleMessage("التاريخ"),
     "historyCleared": MessageLookupByLibrary.simpleMessage("تم مسح التاريخ"),
     "hourlyPricing": MessageLookupByLibrary.simpleMessage("بالساعة"),
     "hourlyRate": MessageLookupByLibrary.simpleMessage("سعر الساعة"),
     "hours": MessageLookupByLibrary.simpleMessage("ساعات"),
+    "initializePrinter": MessageLookupByLibrary.simpleMessage("تهيئة الطابعة"),
     "invalidAmount": MessageLookupByLibrary.simpleMessage("مبلغ غير صحيح"),
     "invalidAmountFormat": MessageLookupByLibrary.simpleMessage(
       "يرجى إدخال مبلغ صالح",
@@ -172,6 +232,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "invoiceHistory": MessageLookupByLibrary.simpleMessage("تاريخ الفواتير"),
     "invoiceId": MessageLookupByLibrary.simpleMessage("رقم الفاتورة"),
+    "invoiceLanguage": MessageLookupByLibrary.simpleMessage("لغة الفاتورة"),
     "invoiceNotFound": MessageLookupByLibrary.simpleMessage(
       "الفاتورة غير موجودة",
     ),
@@ -193,12 +254,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "invoiceRemoved": MessageLookupByLibrary.simpleMessage("تم إزالة الفاتورة"),
     "invoiceStatus": MessageLookupByLibrary.simpleMessage("حالة الفاتورة"),
     "invoices": MessageLookupByLibrary.simpleMessage("الفواتير"),
+    "language": MessageLookupByLibrary.simpleMessage("اللغة"),
+    "light": MessageLookupByLibrary.simpleMessage("فاتح"),
+    "loadInvoices": MessageLookupByLibrary.simpleMessage("تحميل الفواتير"),
     "loading": MessageLookupByLibrary.simpleMessage("جاري التحميل..."),
     "loadingInvoices": MessageLookupByLibrary.simpleMessage(
       "جاري تحميل الفواتير...",
     ),
     "loginButton": MessageLookupByLibrary.simpleMessage("تسجيل الدخول"),
-    "loginFailed": m1,
+    "loginFailed": m2,
     "loginTitle": MessageLookupByLibrary.simpleMessage("تسجيل الدخول"),
     "logout": MessageLookupByLibrary.simpleMessage("تسجيل الخروج"),
     "logoutConfirmation": MessageLookupByLibrary.simpleMessage(
@@ -233,6 +297,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "noPendingInvoices": MessageLookupByLibrary.simpleMessage(
       "لا توجد فواتير قيد الإحضار",
     ),
+    "noPrinterConnected": MessageLookupByLibrary.simpleMessage(
+      "لا توجد طابعة متصلة. يرجى الاتصال بطابعة أولاً.",
+    ),
+    "noPrintersPressSearch": MessageLookupByLibrary.simpleMessage(
+      "لا توجد طابعات. اضغط على البحث",
+    ),
+    "notConnected": MessageLookupByLibrary.simpleMessage("غير متصل"),
+    "notInitialized": MessageLookupByLibrary.simpleMessage("غير مهيأ"),
     "notes": MessageLookupByLibrary.simpleMessage("ملاحظات"),
     "notesDescription": MessageLookupByLibrary.simpleMessage(
       "أضف أي ملاحظات أو تعليقات إضافية (اختياري)",
@@ -244,6 +316,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "optionalField": MessageLookupByLibrary.simpleMessage("هذا الحقل اختياري"),
     "paid": MessageLookupByLibrary.simpleMessage("مدفوعة"),
+    "paperWidth": MessageLookupByLibrary.simpleMessage("عرض الورق"),
     "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
     "payInvoice": MessageLookupByLibrary.simpleMessage("دفع الفاتورة"),
     "pending": MessageLookupByLibrary.simpleMessage("قيد الإحضار"),
@@ -252,6 +325,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "phoneNumber": MessageLookupByLibrary.simpleMessage("رقم الهاتف"),
     "pickupInvoice": MessageLookupByLibrary.simpleMessage("استلام السيارة"),
+    "pleaseConnectToPrinterFirst": MessageLookupByLibrary.simpleMessage(
+      "يرجى الاتصال بطابعة أولاً",
+    ),
+    "pleaseEnableBluetooth": MessageLookupByLibrary.simpleMessage(
+      "يرجى تفعيل البلوتوث",
+    ),
     "pleaseEnterEndBalance": MessageLookupByLibrary.simpleMessage(
       "يرجى إدخال الرصيد النهائي",
     ),
@@ -267,6 +346,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseEnterValidAmount": MessageLookupByLibrary.simpleMessage(
       "يرجى إدخال مبلغ صالح",
     ),
+    "preparingInvoice": MessageLookupByLibrary.simpleMessage(
+      "جاري إعداد الفاتورة...",
+    ),
+    "previewLabel": MessageLookupByLibrary.simpleMessage("معاينة"),
     "previewPdf": MessageLookupByLibrary.simpleMessage("معاينة PDF"),
     "previewPdfSubtitle": MessageLookupByLibrary.simpleMessage(
       "فتح في عارض PDF",
@@ -292,9 +375,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "طباعة PDF مباشرة على الطابعة الحرارية",
     ),
     "printPreview": MessageLookupByLibrary.simpleMessage("معاينة الطباعة"),
+    "printSent": MessageLookupByLibrary.simpleMessage("تم إرسال الطباعة"),
+    "printSettings": MessageLookupByLibrary.simpleMessage("إعدادات الطباعة"),
     "printSuccessful": MessageLookupByLibrary.simpleMessage(
       "تم الطباعة بنجاح!",
     ),
+    "printerInitialized": MessageLookupByLibrary.simpleMessage(
+      "تم تهيئة الطابعة",
+    ),
+    "printerNotConnected": MessageLookupByLibrary.simpleMessage(
+      "الطابعة غير متصلة",
+    ),
+    "printerNotConnectedMessage": MessageLookupByLibrary.simpleMessage(
+      "أنت غير متصل بطابعة. يرجى الاتصال بطابعة لطباعة الفواتير.",
+    ),
+    "printerSettings": MessageLookupByLibrary.simpleMessage("إعدادات الطابعة"),
+    "printerType": MessageLookupByLibrary.simpleMessage("نوع الطابعة"),
+    "printerTypeEscPos": MessageLookupByLibrary.simpleMessage(
+      "ESC/POS Bluetooth",
+    ),
+    "printerTypeNone": MessageLookupByLibrary.simpleMessage("لا يوجد"),
+    "printerTypeSunmi": MessageLookupByLibrary.simpleMessage("Sunmi POS"),
+    "printers": MessageLookupByLibrary.simpleMessage("الطابعات"),
     "printing": MessageLookupByLibrary.simpleMessage("جاري الطباعة..."),
     "processingLogout": MessageLookupByLibrary.simpleMessage(
       "جاري معالجة تسجيل الخروج...",
@@ -305,12 +407,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "qrCodeRequired": MessageLookupByLibrary.simpleMessage(
       "QR Code مطلوب لإنهاء هذه الفاتورة",
     ),
+    "ready": MessageLookupByLibrary.simpleMessage("جاهز"),
     "refresh": MessageLookupByLibrary.simpleMessage("تحديث"),
     "remove": MessageLookupByLibrary.simpleMessage("إزالة"),
+    "reprintReceipt": MessageLookupByLibrary.simpleMessage(
+      "إعادة طباعة الإيصال",
+    ),
+    "reprintTicket": MessageLookupByLibrary.simpleMessage(
+      "إعادة طباعة التذكرة",
+    ),
     "requestCar": MessageLookupByLibrary.simpleMessage("طلب السيارة"),
     "requiredField": MessageLookupByLibrary.simpleMessage("هذا الحقل مطلوب"),
     "retry": MessageLookupByLibrary.simpleMessage("إعادة المحاولة"),
     "save": MessageLookupByLibrary.simpleMessage("حفظ"),
+    "scanDevices": MessageLookupByLibrary.simpleMessage("البحث عن الأجهزة"),
+    "scanError": MessageLookupByLibrary.simpleMessage("خطأ في البحث"),
     "scanQrCode": MessageLookupByLibrary.simpleMessage("مسح QR Code"),
     "scanQrCodeInstructions": MessageLookupByLibrary.simpleMessage(
       "ضع QR Code داخل الإطار لمسحه",
@@ -318,9 +429,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "scanQrToComplete": MessageLookupByLibrary.simpleMessage(
       "يجب مسح QR Code لإنهاء الفاتورة",
     ),
+    "scanning": MessageLookupByLibrary.simpleMessage("جاري البحث..."),
     "search": MessageLookupByLibrary.simpleMessage("بحث"),
     "searchByCarNumber": MessageLookupByLibrary.simpleMessage(
       "البحث برقم السيارة",
+    ),
+    "searchingForPrinters": MessageLookupByLibrary.simpleMessage(
+      "جاري البحث عن الطابعات...",
+    ),
+    "selectPrinterType": MessageLookupByLibrary.simpleMessage(
+      "اختر نوع الطابعة",
     ),
     "sessionEndError": MessageLookupByLibrary.simpleMessage(
       "خطأ في إنهاء الجلسة النشطة",
@@ -336,6 +454,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "تسجيل الدخول للمتابعة",
     ),
     "simpleLogout": MessageLookupByLibrary.simpleMessage("تسجيل الخروج"),
+    "sliceHeight": MessageLookupByLibrary.simpleMessage("ارتفاع الشريحة"),
     "startBalance": MessageLookupByLibrary.simpleMessage("رصيد البداية"),
     "startBalanceRequired": MessageLookupByLibrary.simpleMessage(
       "رصيد البداية مطلوب",
@@ -346,14 +465,25 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "startSession": MessageLookupByLibrary.simpleMessage("بدء الجلسة"),
     "startTime": MessageLookupByLibrary.simpleMessage("وقت البداية"),
+    "stop": MessageLookupByLibrary.simpleMessage("إيقاف"),
     "success": MessageLookupByLibrary.simpleMessage("نجح"),
+    "sunmiPrintError": MessageLookupByLibrary.simpleMessage(
+      "خطأ في طباعة Sunmi",
+    ),
+    "system": MessageLookupByLibrary.simpleMessage("النظام"),
     "systemName": MessageLookupByLibrary.simpleMessage("اسم النظام"),
     "terminate": MessageLookupByLibrary.simpleMessage("إنهاء اليومية"),
     "terminateDaily": MessageLookupByLibrary.simpleMessage("إنهاء اليومية"),
     "terminateDailyAndLogout": MessageLookupByLibrary.simpleMessage(
       "إنهاء الوردية والخروج",
     ),
+    "testPrint": MessageLookupByLibrary.simpleMessage("طباعة تجريبية"),
+    "testPrintSuccess": MessageLookupByLibrary.simpleMessage(
+      "تمت الطباعة التجريبية بنجاح",
+    ),
+    "theme": MessageLookupByLibrary.simpleMessage("المظهر"),
     "timeElapsed": MessageLookupByLibrary.simpleMessage("الوقت المنقضي"),
+    "unknown": MessageLookupByLibrary.simpleMessage("غير معروف"),
     "unpaid": MessageLookupByLibrary.simpleMessage("غير مدفوعة"),
     "userNotAuthenticated": MessageLookupByLibrary.simpleMessage(
       "المستخدم غير مصرح له",

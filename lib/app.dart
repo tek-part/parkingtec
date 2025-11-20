@@ -20,7 +20,7 @@ class App extends ConsumerWidget {
     return MaterialApp.router(
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.light,
+      themeMode: themeMode,
       locale: Locale(language),
       routerConfig: router,
       restorationScopeId: 'app',

@@ -112,6 +112,7 @@ class ConfigPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // System Config Section
           // System Name with Logo
           if (config.systemName != null || config.hasLogo) ...[
             _buildSection(
@@ -334,4 +335,5 @@ class ConfigPage extends ConsumerWidget {
       ],
     );
   }
+
 }

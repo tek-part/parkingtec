@@ -30,8 +30,14 @@ class Routes {
   /// Config page route
   static const String config = '/config';
 
+  /// Settings page route (with tabs)
+  static const String settings = '/settings';
+
   /// Invoices list page route
   static const String invoices = '/invoices';
+
+  /// Printer settings page route
+  static const String printerSettings = '/printer-settings';
 
   // ==================== Route Helper Methods ====================
   // These methods generate routes with parameters

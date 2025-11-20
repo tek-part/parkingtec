@@ -33,7 +33,10 @@ class _QrScannerWidgetState extends ConsumerState<QrScannerWidget> {
   }
 
   /// Extract invoice ID from QR code URL
-  /// Format: https://domain.com/p/{invoice_id}
+  /// Supports multiple formats:
+  /// - https://domain.com/p/{invoice_id}
+  /// - https://domain.com/invoice/{invoice_id}
+  /// - https://domain.com/{invoice_id} (last segment)
   int? _extractInvoiceId(String qrCode) {
     try {
       final uri = Uri.parse(qrCode);
@@ -49,7 +52,17 @@ class _QrScannerWidgetState extends ConsumerState<QrScannerWidget> {
         }
       }
 
-      // If 'p' not found, try to parse last segment as invoice ID
+      // Look for 'invoice' segment followed by invoice ID
+      for (int i = 0; i < segments.length; i++) {
+        if (segments[i] == 'invoice' && i + 1 < segments.length) {
+          final invoiceId = int.tryParse(segments[i + 1]);
+          if (invoiceId != null && invoiceId > 0) {
+            return invoiceId;
+          }
+        }
+      }
+
+      // If 'p' or 'invoice' not found, try to parse last segment as invoice ID
       if (segments.isNotEmpty) {
         final invoiceId = int.tryParse(segments.last);
         if (invoiceId != null && invoiceId > 0) {

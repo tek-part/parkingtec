@@ -60,7 +60,7 @@ class InvoiceHistoryScreen extends ConsumerWidget {
             SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: () =>
-                  ref.read(invoiceControllerProvider.notifier).loadAllInvoices(),
+                  ref.read(allInvoicesControllerProvider.notifier).loadAllInvoices(),
               child: Text('Retry'),
             ),
           ],

@@ -8,42 +8,52 @@ class FcmService {
 
   /// Initialize FCM service
   static Future<void> initialize() async {
-    _firebaseMessaging = FirebaseMessaging.instance;
+    try {
+      _firebaseMessaging = FirebaseMessaging.instance;
 
-    // Request notification permissions (iOS)
-    await requestPermissions();
+      // Request notification permissions (iOS)
+      await requestPermissions();
 
-    // Get FCM token
-    await _getFcmToken();
+      // Get FCM token (non-blocking, won't crash app if it fails)
+      _getFcmToken().catchError((e) {
+        print('FCM initialization error (non-critical): $e');
+        // Don't throw - FCM is optional for app functionality
+        return null;
+      });
 
-    // Listen for token refresh
-    _firebaseMessaging?.onTokenRefresh.listen((newToken) {
-      _fcmToken = newToken;
-      print('FCM Token refreshed: $newToken');
-      // TODO: Send new token to your backend
-    });
+      // Listen for token refresh
+      _firebaseMessaging?.onTokenRefresh.listen((newToken) {
+        _fcmToken = newToken;
+        print('FCM Token refreshed: $newToken');
+        // TODO: Send new token to your backend
+      });
 
-    // Handle foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received foreground message: ${message.messageId}');
-      print('Message data: ${message.data}');
-      print('Message notification: ${message.notification?.title}');
-      // TODO: Show local notification or update UI
-    });
+      // Handle foreground messages
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Received foreground message: ${message.messageId}');
+        print('Message data: ${message.data}');
+        print('Message notification: ${message.notification?.title}');
+        // TODO: Show local notification or update UI
+      });
 
-    // Handle notification tap when app is in background
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notification opened app: ${message.messageId}');
-      print('Message data: ${message.data}');
-      // TODO: Navigate to specific screen based on message data
-    });
+      // Handle notification tap when app is in background
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print('Notification opened app: ${message.messageId}');
+        print('Message data: ${message.data}');
+        // TODO: Navigate to specific screen based on message data
+      });
 
-    // Check if app was opened from a notification (when app was terminated)
-    final initialMessage = await _firebaseMessaging?.getInitialMessage();
-    if (initialMessage != null) {
-      print('App opened from notification: ${initialMessage.messageId}');
-      print('Message data: ${initialMessage.data}');
-      // TODO: Navigate to specific screen based on message data
+      // Check if app was opened from a notification (when app was terminated)
+      final initialMessage = await _firebaseMessaging?.getInitialMessage();
+      if (initialMessage != null) {
+        print('App opened from notification: ${initialMessage.messageId}');
+        print('Message data: ${initialMessage.data}');
+        // TODO: Navigate to specific screen based on message data
+      }
+    } catch (e) {
+      print('FCM initialization error (non-critical): $e');
+      // Don't throw - FCM is optional for app functionality
+      // App can still work without FCM token
     }
   }
 
@@ -74,9 +84,41 @@ class FcmService {
       if (_firebaseMessaging == null) {
         _firebaseMessaging = FirebaseMessaging.instance;
       }
-      _fcmToken = await _firebaseMessaging?.getToken();
-      print('FCM Token obtained: $_fcmToken');
-      return _fcmToken;
+      
+      // Add retry logic for SERVICE_NOT_AVAILABLE error
+      int retries = 3;
+      while (retries > 0) {
+        try {
+          _fcmToken = await _firebaseMessaging?.getToken();
+          if (_fcmToken != null) {
+            print('FCM Token obtained: $_fcmToken');
+            return _fcmToken;
+          }
+        } catch (e) {
+          final errorMessage = e.toString();
+          
+          // Check if it's a SERVICE_NOT_AVAILABLE error
+          if (errorMessage.contains('SERVICE_NOT_AVAILABLE')) {
+            retries--;
+            if (retries > 0) {
+              print('FCM SERVICE_NOT_AVAILABLE, retrying in 2 seconds... ($retries attempts left)');
+              await Future.delayed(const Duration(seconds: 2));
+              continue;
+            } else {
+              print('FCM SERVICE_NOT_AVAILABLE: Google Play Services may not be available. '
+                  'This is normal on emulators without Google Play Services.');
+              return null;
+            }
+          } else {
+            // Other errors, don't retry
+            print('Error getting FCM token: $e');
+            return null;
+          }
+        }
+        retries--;
+      }
+      
+      return null;
     } catch (e) {
       print('Error getting FCM token: $e');
       return null;
@@ -111,9 +153,9 @@ class FcmService {
       if (_firebaseMessaging == null) {
         _firebaseMessaging = FirebaseMessaging.instance;
       }
-      _fcmToken = await _firebaseMessaging?.getToken();
-      print('FCM Token refreshed: $_fcmToken');
-      return _fcmToken;
+      
+      // Use the same retry logic as _getFcmToken
+      return await _getFcmToken();
     } catch (e) {
       print('Error refreshing FCM token: $e');
       return null;

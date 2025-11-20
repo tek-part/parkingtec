@@ -69,9 +69,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -82,7 +80,9 @@ class InvoiceController extends StateNotifier<InvoiceState> {
     _safeSetState(const InvoiceState.loading());
 
     try {
-      final getActiveInvoicesUseCase = ref.read(getActiveInvoicesUseCaseProvider);
+      final getActiveInvoicesUseCase = ref.read(
+        getActiveInvoicesUseCaseProvider,
+      );
       final result = await getActiveInvoicesUseCase.execute();
       if (_isDisposed) return;
 
@@ -118,9 +118,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -131,7 +129,9 @@ class InvoiceController extends StateNotifier<InvoiceState> {
     _safeSetState(const InvoiceState.loading());
 
     try {
-      final getPendingInvoicesUseCase = ref.read(getPendingInvoicesUseCaseProvider);
+      final getPendingInvoicesUseCase = ref.read(
+        getPendingInvoicesUseCaseProvider,
+      );
       final result = await getPendingInvoicesUseCase.execute();
       if (_isDisposed) return;
 
@@ -167,9 +167,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -181,8 +179,12 @@ class InvoiceController extends StateNotifier<InvoiceState> {
 
     try {
       final getAllInvoicesUseCase = ref.read(getAllInvoicesUseCaseProvider);
-      final getActiveInvoicesUseCase = ref.read(getActiveInvoicesUseCaseProvider);
-      final getPendingInvoicesUseCase = ref.read(getPendingInvoicesUseCaseProvider);
+      final getActiveInvoicesUseCase = ref.read(
+        getActiveInvoicesUseCaseProvider,
+      );
+      final getPendingInvoicesUseCase = ref.read(
+        getPendingInvoicesUseCaseProvider,
+      );
 
       final results = await Future.wait([
         getAllInvoicesUseCase.execute(),
@@ -194,13 +196,10 @@ class InvoiceController extends StateNotifier<InvoiceState> {
 
       // Check for errors
       for (final result in results) {
-        result.fold(
-          (failure) {
-            _safeSetState(InvoiceState.error(failure: failure));
-            return;
-          },
-          (_) {},
-        );
+        result.fold((failure) {
+          _safeSetState(InvoiceState.error(failure: failure));
+          return;
+        }, (_) {});
       }
 
       // All succeeded
@@ -208,47 +207,36 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       final activeResult = results[1];
       final pendingResult = results[2];
 
-      allResult.fold(
-        (_) {},
-        (allInvoices) {
-          activeResult.fold(
-            (_) {},
-            (activeInvoices) {
-              pendingResult.fold(
-                (_) {},
-                (pendingInvoices) {
-                  final currentState = state;
-                  Invoice? currentInvoice;
-                  String searchQuery = '';
-                  
-                  currentState.maybeWhen(
-                    loaded: (_, __, ___, current, query) {
-                      currentInvoice = current;
-                      searchQuery = query;
-                    },
-                    orElse: () {},
-                  );
-                  
-                  _safeSetState(
-                    InvoiceState.loaded(
-                      allInvoices: allInvoices,
-                      activeInvoices: activeInvoices,
-                      pendingInvoices: pendingInvoices,
-                      currentInvoice: currentInvoice,
-                      searchQuery: searchQuery,
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
-      );
+      allResult.fold((_) {}, (allInvoices) {
+        activeResult.fold((_) {}, (activeInvoices) {
+          pendingResult.fold((_) {}, (pendingInvoices) {
+            final currentState = state;
+            Invoice? currentInvoice;
+            String searchQuery = '';
+
+            currentState.maybeWhen(
+              loaded: (_, __, ___, current, query) {
+                currentInvoice = current;
+                searchQuery = query;
+              },
+              orElse: () {},
+            );
+
+            _safeSetState(
+              InvoiceState.loaded(
+                allInvoices: allInvoices,
+                activeInvoices: activeInvoices,
+                pendingInvoices: pendingInvoices,
+                currentInvoice: currentInvoice,
+                searchQuery: searchQuery,
+              ),
+            );
+          });
+        });
+      });
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -258,7 +246,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
   /// Clears currentInvoice if loading a different invoice
   Future<void> loadInvoice(int invoiceId) async {
     if (_isDisposed) return;
-    
+
     // Preserve current state if it's loaded (to keep invoice lists)
     final currentState = state;
     final hasLoadedData = currentState.maybeWhen(
@@ -337,9 +325,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed && !hasLoadedData) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -359,15 +345,44 @@ class InvoiceController extends StateNotifier<InvoiceState> {
           _safeSetState(InvoiceState.error(failure: failure));
         },
         (invoice) {
-          // Reload all lists after creating invoice
-          loadAllInvoiceLists();
+          // Set current invoice to the newly created invoice
+          // Then reload all lists
+          final currentState = state;
+          currentState.maybeWhen(
+            loaded: (all, active, pending, _, query) {
+              _safeSetState(
+                InvoiceState.loaded(
+                  allInvoices: all,
+                  activeInvoices: active,
+                  pendingInvoices: pending,
+                  currentInvoice: invoice, // Set newly created invoice
+                  searchQuery: query,
+                ),
+              );
+            },
+            orElse: () {
+              // If state is not loaded, set it with the new invoice
+              _safeSetState(
+                InvoiceState.loaded(
+                  allInvoices: const [],
+                  activeInvoices: const [],
+                  pendingInvoices: const [],
+                  currentInvoice: invoice,
+                ),
+              );
+            },
+          );
+          // Delay reload to allow dialog to close first
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (!_isDisposed) {
+              loadAllInvoiceLists();
+            }
+          });
         },
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -409,9 +424,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -454,9 +467,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -498,9 +509,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -526,9 +535,7 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       );
     } catch (e) {
       if (!_isDisposed) {
-        _safeSetState(
-          InvoiceState.error(failure: ServerFailure(e.toString())),
-        );
+        _safeSetState(InvoiceState.error(failure: ServerFailure(e.toString())));
       }
     }
   }
@@ -567,5 +574,88 @@ class InvoiceController extends StateNotifier<InvoiceState> {
       orElse: () {},
     );
   }
-}
 
+  /// Search in already loaded invoices (no API call)
+  void searchInLoadedInvoices(String query) {
+    final currentState = state;
+    currentState.maybeWhen(
+      loaded: (all, active, pending, current, _) {
+        // Filter invoices based on query
+        final filteredAll = all
+            .where(
+              (invoice) =>
+                  invoice.carNum.toLowerCase().contains(query.toLowerCase()) ||
+                  (invoice.customerName?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false) ||
+                  (invoice.carModel?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false),
+            )
+            .toList();
+
+        final filteredActive = active
+            .where(
+              (invoice) =>
+                  invoice.carNum.toLowerCase().contains(query.toLowerCase()) ||
+                  (invoice.customerName?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false) ||
+                  (invoice.carModel?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false),
+            )
+            .toList();
+
+        final filteredPending = pending
+            .where(
+              (invoice) =>
+                  invoice.carNum.toLowerCase().contains(query.toLowerCase()) ||
+                  (invoice.customerName?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false) ||
+                  (invoice.carModel?.toLowerCase().contains(
+                        query.toLowerCase(),
+                      ) ??
+                      false),
+            )
+            .toList();
+
+        _safeSetState(
+          InvoiceState.loaded(
+            allInvoices: filteredAll,
+            activeInvoices: filteredActive,
+            pendingInvoices: filteredPending,
+            currentInvoice: current,
+            searchQuery: query,
+          ),
+        );
+      },
+      orElse: () {},
+    );
+  }
+
+  /// Clear search query and show all loaded invoices
+  void clearSearch() {
+    final currentState = state;
+    currentState.maybeWhen(
+      loaded: (all, active, pending, current, _) {
+        _safeSetState(
+          InvoiceState.loaded(
+            allInvoices: all,
+            activeInvoices: active,
+            pendingInvoices: pending,
+            currentInvoice: current,
+            searchQuery: '',
+          ),
+        );
+      },
+      orElse: () {},
+    );
+  }
+}

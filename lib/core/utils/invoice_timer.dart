@@ -13,10 +13,15 @@ class InvoiceTimer {
   }
 
   /// Calculate hours from duration
+  /// If user starts in a new hour, it counts as a full hour
+  /// Example: If started at 10:01, it counts as 1.0 hour
   static double calculateHours(Duration duration) {
     // Minimum 0.25 hours (15 minutes)
     final hours = duration.inMinutes / 60.0;
-    return hours < 0.25 ? 0.25 : hours;
+    final roundedHours = hours < 0.25 ? 0.25 : hours;
+    // Round up to next hour if started in new hour
+    // This means if any time has passed in a new hour, count it as full hour
+    return roundedHours.ceil().toDouble();
   }
 
   /// Calculate current amount for hourly invoice

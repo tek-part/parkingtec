@@ -26,18 +26,18 @@ class CustomActionsAppBar extends ConsumerWidget {
             onPressed: () => context.push(Routes.invoices),
           ),
 
-          // History Button
-          _ActionButton(
-            icon: Icons.history,
-            label: S.of(context).history,
-            onPressed: () => context.go(Routes.history),
-          ),
+          // // History Button
+          // _ActionButton(
+          //   icon: Icons.history,
+          //   label: S.of(context).history,
+          //   onPressed: () => context.go(Routes.history),
+          // ),
 
           // Settings Button
           _ActionButton(
             icon: Icons.settings,
             label: S.of(context).settings,
-            onPressed: () => context.push(Routes.config),
+            onPressed: () => context.push(Routes.settings),
           ),
 
           // End Session Button

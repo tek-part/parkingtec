@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/features/invoice/data/models/invoice.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_card_widget.dart';
+import 'package:parkingtec/generated/l10n.dart';
 
 /// Invoice List Widget
 /// Reusable widget for displaying a list of invoices
@@ -11,6 +12,7 @@ import 'package:parkingtec/features/invoice/presentation/widgets/invoice_card_wi
 class InvoiceListWidget extends ConsumerWidget {
   final List<Invoice> invoices;
   final VoidCallback? onRefresh;
+  final VoidCallback? onLoadRequested;
   final String emptyMessage;
   final bool isTablet;
 
@@ -18,6 +20,7 @@ class InvoiceListWidget extends ConsumerWidget {
     super.key,
     required this.invoices,
     this.onRefresh,
+    this.onLoadRequested,
     required this.emptyMessage,
     this.isTablet = false,
   });
@@ -82,6 +85,18 @@ class InvoiceListWidget extends ConsumerWidget {
                   ),
               textAlign: TextAlign.center,
             ),
+            if (onLoadRequested != null) ...[
+              SizedBox(height: 24.h),
+              ElevatedButton.icon(
+                onPressed: onLoadRequested,
+                icon: const Icon(Icons.refresh),
+                label: Text(S.of(context).loadInvoices),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
           ],
         ),
       ),

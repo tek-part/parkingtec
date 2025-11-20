@@ -69,17 +69,18 @@ class _InvoiceTimerWidgetState extends ConsumerState<InvoiceTimerWidget> {
         ? widget.invoice.hourlyRate! * hours
         : null;
 
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: AppColors.card(context),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: AppColors.border(context),
-          width: 1,
+    return RepaintBoundary(
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: AppColors.card(context),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: AppColors.border(context),
+            width: 1,
+          ),
         ),
-      ),
-      child: Column(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -98,7 +99,7 @@ class _InvoiceTimerWidgetState extends ConsumerState<InvoiceTimerWidget> {
                 InvoiceTimer.formatDuration(_currentDuration),
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: AppColors.primaryX(context),
                     ),
               ),
 
@@ -112,7 +113,7 @@ class _InvoiceTimerWidgetState extends ConsumerState<InvoiceTimerWidget> {
                   ),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: AppColors.primaryX(context),
                       ),
                 ),
             ],
@@ -125,6 +126,7 @@ class _InvoiceTimerWidgetState extends ConsumerState<InvoiceTimerWidget> {
                 ),
           ),
         ],
+      ),
       ),
     );
   }

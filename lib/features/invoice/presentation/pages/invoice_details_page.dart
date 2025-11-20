@@ -5,7 +5,7 @@ import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/core/utils/currency_formatter.dart';
 import 'package:parkingtec/core/widgets/back_button_widget.dart';
 import 'package:parkingtec/features/config/providers/config_providers.dart';
-import 'package:parkingtec/features/invoice/presentation/states/invoice_state.dart';
+import 'package:parkingtec/features/invoice/presentation/states/invoice_details_state.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_actions_widget.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_car_details_widget.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_header_widget.dart';
@@ -13,6 +13,9 @@ import 'package:parkingtec/features/invoice/presentation/widgets/invoice_payment
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_qr_code_widget.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_timer_widget.dart';
 import 'package:parkingtec/features/invoice/providers/invoice_providers.dart';
+import 'package:parkingtec/features/printing/presentation/widgets/dialogs/printer_not_connected_dialog.dart';
+import 'package:parkingtec/features/printing/providers/printing_providers.dart';
+import 'package:parkingtec/features/printing/utils/printer_connection_helper.dart';
 import 'package:parkingtec/generated/l10n.dart';
 
 /// Invoice Details Page
@@ -20,10 +23,7 @@ import 'package:parkingtec/generated/l10n.dart';
 class InvoiceDetailsPage extends ConsumerStatefulWidget {
   final int invoiceId;
 
-  const InvoiceDetailsPage({
-    super.key,
-    required this.invoiceId,
-  });
+  const InvoiceDetailsPage({super.key, required this.invoiceId});
 
   @override
   ConsumerState<InvoiceDetailsPage> createState() => _InvoiceDetailsPageState();
@@ -33,37 +33,40 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
   @override
   void initState() {
     super.initState();
-    // Clear current invoice and load new one on init
+    // Load invoice on init
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = ref.read(invoiceControllerProvider.notifier);
-      // Clear current invoice first to avoid showing old data
-      controller.clearCurrentInvoice();
-      // Then load the new invoice
-      controller.loadInvoice(widget.invoiceId);
+      ref
+          .read(invoiceDetailsControllerProvider(widget.invoiceId).notifier)
+          .loadInvoice();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final invoiceState = ref.watch(invoiceControllerProvider);
+    final invoiceDetailsState = ref.watch(
+      invoiceDetailsControllerProvider(widget.invoiceId),
+    );
 
     // Listen for errors
-    ref.listen<InvoiceState>(invoiceControllerProvider, (previous, next) {
-      next.maybeWhen(
-        error: (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                failure.message,
-                style: const TextStyle(color: Colors.white),
+    ref.listen<InvoiceDetailsState>(
+      invoiceDetailsControllerProvider(widget.invoiceId),
+      (previous, next) {
+        next.maybeWhen(
+          error: (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  failure.message,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                backgroundColor: AppColors.error,
               ),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        },
-        orElse: () {},
-      );
-    });
+            );
+          },
+          orElse: () {},
+        );
+      },
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
@@ -72,23 +75,25 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
         title: Text(
           S.of(context).invoiceDetails,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryX(context),
-              ),
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryX(context),
+          ),
         ),
         backgroundColor: AppColors.background(context),
         elevation: 0,
+        actions: [
+          // Print button
+          IconButton(
+            icon: const Icon(Icons.print),
+            onPressed: () => _handlePrintInvoice(context, invoiceDetailsState),
+            tooltip: S.of(context).printInvoice,
+          ),
+        ],
       ),
-      body: invoiceState.when(
+      body: invoiceDetailsState.when(
         initial: () => _buildLoadingState(context),
         loading: () => _buildLoadingState(context),
-        loaded: (_, __, ___, invoice, ____) {
-          // Check if invoice matches the requested invoiceId
-          if (invoice == null || invoice.invoiceId != widget.invoiceId) {
-            return _buildLoadingState(context);
-          }
-          return _buildInvoiceDetails(context, invoice);
-        },
+        loaded: (invoice) => _buildInvoiceDetails(context, invoice),
         error: (failure) => _buildErrorState(context, failure.message),
       ),
     );
@@ -131,10 +136,7 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
               decoration: BoxDecoration(
                 color: AppColors.card(context),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: AppColors.border(context),
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.border(context), width: 1),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,9 +144,9 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
                   Text(
                     S.of(context).finalAmount,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.textSecondary(context),
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: AppColors.textSecondary(context),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -154,9 +156,9 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
                       currencySymbol,
                     ),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary(context),
+                    ),
                   ),
                 ],
               ),
@@ -182,14 +184,16 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppColors.primaryX(context),
+            ),
           ),
           SizedBox(height: 16.h),
           Text(
             S.of(context).loading,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary(context),
-                ),
+              color: AppColors.textSecondary(context),
+            ),
           ),
         ],
       ),
@@ -203,27 +207,29 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64.w,
-              color: AppColors.error,
-            ),
+            Icon(Icons.error_outline, size: 64.w, color: AppColors.error),
             SizedBox(height: 16.h),
             Text(
               errorMessage,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.error,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: AppColors.error),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
-                ref.read(invoiceControllerProvider.notifier).loadInvoice(widget.invoiceId);
+                ref
+                    .read(
+                      invoiceDetailsControllerProvider(
+                        widget.invoiceId,
+                      ).notifier,
+                    )
+                    .loadInvoice();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primaryX(context),
+                foregroundColor: AppColors.background(context),
               ),
               child: Text(S.of(context).retry),
             ),
@@ -232,5 +238,85 @@ class _InvoiceDetailsPageState extends ConsumerState<InvoiceDetailsPage> {
       ),
     );
   }
-}
 
+  /// Handle print invoice action
+  Future<void> _handlePrintInvoice(
+    BuildContext context,
+    InvoiceDetailsState state,
+  ) async {
+    // Check if invoice is loaded
+    final invoice = state.maybeWhen(loaded: (inv) => inv, orElse: () => null);
+
+    if (invoice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context).loading),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+
+    // Check printer connection
+    final isConnected = PrinterConnectionHelper.isPrinterConnected(ref);
+
+    if (!isConnected) {
+      // Show dialog
+      await PrinterNotConnectedDialog.show(context);
+      // If user chose to continue without printing, do nothing (no print action)
+      // If user navigated to settings, do nothing
+      // If user cancelled, do nothing
+      return;
+    }
+
+    // Printer is connected, proceed with printing
+    try {
+      final appConfig = ref.read(appConfigProvider);
+      if (appConfig == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context).configError),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      final printUseCase = ref.read(printInvoiceUseCaseProvider);
+      final printResult = await printUseCase.printEntryTicket(
+        invoice,
+        appConfig.toModel(),
+      );
+
+      if (mounted) {
+        printResult.fold(
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(failure.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          },
+          (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(S.of(context).invoicePrintedSuccess),
+                backgroundColor: AppColors.success,
+              ),
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${S.of(context).printError}: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+}

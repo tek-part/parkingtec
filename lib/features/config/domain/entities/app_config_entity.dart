@@ -1,3 +1,5 @@
+import 'package:parkingtec/features/config/data/models/app_config.dart';
+
 /// App Config Entity
 /// Immutable domain object representing application configuration
 class AppConfigEntity {
@@ -37,6 +39,21 @@ class AppConfigEntity {
 
   /// Get currency display text
   String get currencyDisplay => currencySymbol ?? currency ?? '';
+
+  /// Convert to AppConfig model (for printing use cases)
+  AppConfig toModel() {
+    return AppConfig(
+      barcodeEnabled: barcodeEnabled,
+      showPrices: showPrices,
+      pricingType: pricingType,
+      defaultFixedPrice: defaultFixedPrice,
+      defaultHourlyRate: defaultHourlyRate,
+      currency: currency,
+      currencySymbol: currencySymbol,
+      systemName: systemName,
+      logo: logo,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

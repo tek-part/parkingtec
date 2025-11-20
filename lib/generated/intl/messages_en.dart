@@ -20,10 +20,12 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(amount) =>
+  static String m0(deviceName) => "Connected to ${deviceName}";
+
+  static String m1(amount) =>
       "The daily session will be ended with balance ${amount}";
 
-  static String m1(error) => "Login failed: ${error}";
+  static String m2(error) => "Login failed: ${error}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -40,7 +42,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "amountRequired": MessageLookupByLibrary.simpleMessage(
       "Amount is required",
     ),
-    "appConfig": MessageLookupByLibrary.simpleMessage("App Configuration"),
+    "amountWillBeCalculated": MessageLookupByLibrary.simpleMessage(
+      "Amount will be calculated based on hourly rate when invoice is completed",
+    ),
+    "appConfig": MessageLookupByLibrary.simpleMessage("App Config"),
+    "appSettings": MessageLookupByLibrary.simpleMessage("App Settings"),
     "appSubtitle": MessageLookupByLibrary.simpleMessage(
       "Smart Parking Solutions",
     ),
@@ -55,11 +61,44 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Are you sure you want to terminate the daily?",
         ),
+    "autoPrintOnComplete": MessageLookupByLibrary.simpleMessage(
+      "Auto Print on Complete",
+    ),
+    "autoPrintOnCompleteDesc": MessageLookupByLibrary.simpleMessage(
+      "Automatically print exit receipt when invoice is completed",
+    ),
+    "autoPrintOnCreate": MessageLookupByLibrary.simpleMessage(
+      "Auto Print on Create",
+    ),
+    "autoPrintOnCreateDesc": MessageLookupByLibrary.simpleMessage(
+      "Automatically print entry ticket when invoice is created",
+    ),
+    "autoPrintOptions": MessageLookupByLibrary.simpleMessage(
+      "Auto Print Options",
+    ),
+    "availableDevices": MessageLookupByLibrary.simpleMessage(
+      "Available Devices",
+    ),
     "barcodeEnabled": MessageLookupByLibrary.simpleMessage("Barcode Enabled"),
+    "bluetoothPrintError": MessageLookupByLibrary.simpleMessage(
+      "Bluetooth print error",
+    ),
+    "bluetoothPrinterNotConnected": MessageLookupByLibrary.simpleMessage(
+      "Bluetooth printer not connected",
+    ),
+    "bluetoothTestPrintNotImplemented": MessageLookupByLibrary.simpleMessage(
+      "Bluetooth test print - implement ESC/POS commands",
+    ),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "carColor": MessageLookupByLibrary.simpleMessage("Car Color"),
     "carModel": MessageLookupByLibrary.simpleMessage("Car Model"),
+    "carModelOptional": MessageLookupByLibrary.simpleMessage(
+      "Car Model (Optional)",
+    ),
     "carNumber": MessageLookupByLibrary.simpleMessage("Car Number"),
+    "carNumberRequired": MessageLookupByLibrary.simpleMessage(
+      "Car number is required",
+    ),
     "carRequested": MessageLookupByLibrary.simpleMessage("Car requested"),
     "clear": MessageLookupByLibrary.simpleMessage("Clear"),
     "clearHistory": MessageLookupByLibrary.simpleMessage("Clear History"),
@@ -80,12 +119,34 @@ class MessageLookup extends MessageLookupByLibrary {
       "Confirm End Session",
     ),
     "confirmLogout": MessageLookupByLibrary.simpleMessage("Confirm Logout"),
+    "connect": MessageLookupByLibrary.simpleMessage("Connect"),
+    "connected": MessageLookupByLibrary.simpleMessage("Connected"),
+    "connectedDevice": MessageLookupByLibrary.simpleMessage("Connected Device"),
+    "connectedPrinter": MessageLookupByLibrary.simpleMessage(
+      "Connected Printer",
+    ),
+    "connectedPrinterShownAtTop": MessageLookupByLibrary.simpleMessage(
+      "Connected printer shown at top",
+    ),
+    "connectedToDevice": m0,
+    "connectionFailed": MessageLookupByLibrary.simpleMessage(
+      "Connection failed",
+    ),
+    "connectionStatus": MessageLookupByLibrary.simpleMessage(
+      "Connection Status",
+    ),
+    "continueWithoutPrinting": MessageLookupByLibrary.simpleMessage(
+      "Continue without printing",
+    ),
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "createInvoice": MessageLookupByLibrary.simpleMessage("Create Invoice"),
     "currency": MessageLookupByLibrary.simpleMessage("EGP"),
     "currencySymbol": MessageLookupByLibrary.simpleMessage("Currency Symbol"),
     "currentAmount": MessageLookupByLibrary.simpleMessage("Current Amount"),
     "customerName": MessageLookupByLibrary.simpleMessage("Customer Name"),
+    "customerNameOptional": MessageLookupByLibrary.simpleMessage(
+      "Customer Name (Optional)",
+    ),
     "dailyAlreadyOpen": MessageLookupByLibrary.simpleMessage(
       "A daily is already open",
     ),
@@ -95,6 +156,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dailyTerminatedSuccess": MessageLookupByLibrary.simpleMessage(
       "Daily terminated successfully",
     ),
+    "dark": MessageLookupByLibrary.simpleMessage("Dark"),
     "date": MessageLookupByLibrary.simpleMessage("Date"),
     "defaultFixedPrice": MessageLookupByLibrary.simpleMessage(
       "Default Fixed Price",
@@ -103,6 +165,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Default Hourly Rate",
     ),
     "disabled": MessageLookupByLibrary.simpleMessage("Disabled"),
+    "disconnect": MessageLookupByLibrary.simpleMessage("Disconnect"),
+    "disconnected": MessageLookupByLibrary.simpleMessage("Disconnected"),
     "done": MessageLookupByLibrary.simpleMessage("Done"),
     "duration": MessageLookupByLibrary.simpleMessage("Duration"),
     "enabled": MessageLookupByLibrary.simpleMessage("Enabled"),
@@ -115,7 +179,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "endInvoice": MessageLookupByLibrary.simpleMessage("End Invoice"),
     "endSession": MessageLookupByLibrary.simpleMessage("End Session"),
-    "endSessionConfirmationMessage": m0,
+    "endSessionConfirmationMessage": m1,
     "endSessionDialogTitle": MessageLookupByLibrary.simpleMessage(
       "End Daily Session",
     ),
@@ -147,11 +211,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "finalAmount": MessageLookupByLibrary.simpleMessage("Final Amount"),
     "findParking": MessageLookupByLibrary.simpleMessage("Find Parking"),
     "fixedPricing": MessageLookupByLibrary.simpleMessage("Fixed"),
+    "goToSettings": MessageLookupByLibrary.simpleMessage("Go to Settings"),
     "history": MessageLookupByLibrary.simpleMessage("History"),
     "historyCleared": MessageLookupByLibrary.simpleMessage("History cleared"),
     "hourlyPricing": MessageLookupByLibrary.simpleMessage("Hourly"),
     "hourlyRate": MessageLookupByLibrary.simpleMessage("Hourly Rate"),
     "hours": MessageLookupByLibrary.simpleMessage("hours"),
+    "initializePrinter": MessageLookupByLibrary.simpleMessage(
+      "Initialize Printer",
+    ),
     "invalidAmount": MessageLookupByLibrary.simpleMessage("Invalid amount"),
     "invalidAmountFormat": MessageLookupByLibrary.simpleMessage(
       "Please enter a valid amount",
@@ -181,6 +249,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "invoiceHistory": MessageLookupByLibrary.simpleMessage("Invoice History"),
     "invoiceId": MessageLookupByLibrary.simpleMessage("Invoice ID"),
+    "invoiceLanguage": MessageLookupByLibrary.simpleMessage("Invoice Language"),
     "invoiceNotFound": MessageLookupByLibrary.simpleMessage(
       "Invoice not found",
     ),
@@ -202,12 +271,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "invoiceRemoved": MessageLookupByLibrary.simpleMessage("Invoice removed"),
     "invoiceStatus": MessageLookupByLibrary.simpleMessage("Invoice Status"),
     "invoices": MessageLookupByLibrary.simpleMessage("Invoices"),
+    "language": MessageLookupByLibrary.simpleMessage("Language"),
+    "light": MessageLookupByLibrary.simpleMessage("Light"),
+    "loadInvoices": MessageLookupByLibrary.simpleMessage("Load Invoices"),
     "loading": MessageLookupByLibrary.simpleMessage("Loading..."),
     "loadingInvoices": MessageLookupByLibrary.simpleMessage(
       "Loading invoices...",
     ),
     "loginButton": MessageLookupByLibrary.simpleMessage("Login"),
-    "loginFailed": m1,
+    "loginFailed": m2,
     "loginTitle": MessageLookupByLibrary.simpleMessage("Login"),
     "logout": MessageLookupByLibrary.simpleMessage("Logout"),
     "logoutConfirmation": MessageLookupByLibrary.simpleMessage(
@@ -242,6 +314,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "noPendingInvoices": MessageLookupByLibrary.simpleMessage(
       "No pending invoices",
     ),
+    "noPrinterConnected": MessageLookupByLibrary.simpleMessage(
+      "No printer connected. Please connect a printer first.",
+    ),
+    "noPrintersPressSearch": MessageLookupByLibrary.simpleMessage(
+      "No printers. Press search",
+    ),
+    "notConnected": MessageLookupByLibrary.simpleMessage("Not Connected"),
+    "notInitialized": MessageLookupByLibrary.simpleMessage("Not Initialized"),
     "notes": MessageLookupByLibrary.simpleMessage("Notes"),
     "notesDescription": MessageLookupByLibrary.simpleMessage(
       "Add any additional notes or comments (optional)",
@@ -255,12 +335,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "This field is optional",
     ),
     "paid": MessageLookupByLibrary.simpleMessage("Paid"),
+    "paperWidth": MessageLookupByLibrary.simpleMessage("Paper Width"),
     "password": MessageLookupByLibrary.simpleMessage("Password"),
     "payInvoice": MessageLookupByLibrary.simpleMessage("Pay Invoice"),
     "pending": MessageLookupByLibrary.simpleMessage("Pending"),
     "pendingInvoices": MessageLookupByLibrary.simpleMessage("Pending Invoices"),
     "phoneNumber": MessageLookupByLibrary.simpleMessage("Phone Number"),
     "pickupInvoice": MessageLookupByLibrary.simpleMessage("Pickup Invoice"),
+    "pleaseConnectToPrinterFirst": MessageLookupByLibrary.simpleMessage(
+      "Please connect to a printer first",
+    ),
+    "pleaseEnableBluetooth": MessageLookupByLibrary.simpleMessage(
+      "Please enable Bluetooth",
+    ),
     "pleaseEnterEndBalance": MessageLookupByLibrary.simpleMessage(
       "Please enter the end balance",
     ),
@@ -276,13 +363,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseEnterValidAmount": MessageLookupByLibrary.simpleMessage(
       "Please enter a valid amount",
     ),
+    "preparingInvoice": MessageLookupByLibrary.simpleMessage(
+      "Preparing invoice...",
+    ),
+    "previewLabel": MessageLookupByLibrary.simpleMessage("Preview"),
     "previewPdf": MessageLookupByLibrary.simpleMessage("Preview PDF"),
     "previewPdfSubtitle": MessageLookupByLibrary.simpleMessage(
       "Open in PDF viewer",
     ),
     "pricingType": MessageLookupByLibrary.simpleMessage("Pricing Type"),
     "print": MessageLookupByLibrary.simpleMessage("Print"),
-    "printError": MessageLookupByLibrary.simpleMessage("Print Error"),
+    "printError": MessageLookupByLibrary.simpleMessage("Print error"),
     "printFailed": MessageLookupByLibrary.simpleMessage("Print failed"),
     "printInvoice": MessageLookupByLibrary.simpleMessage("Print Invoice"),
     "printNative": MessageLookupByLibrary.simpleMessage("Print Native"),
@@ -301,9 +392,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "Print PDF directly on thermal printer",
     ),
     "printPreview": MessageLookupByLibrary.simpleMessage("Print Preview"),
+    "printSent": MessageLookupByLibrary.simpleMessage("Print sent"),
+    "printSettings": MessageLookupByLibrary.simpleMessage("Print Settings"),
     "printSuccessful": MessageLookupByLibrary.simpleMessage(
       "Print successful!",
     ),
+    "printerInitialized": MessageLookupByLibrary.simpleMessage(
+      "Printer initialized",
+    ),
+    "printerNotConnected": MessageLookupByLibrary.simpleMessage(
+      "Printer Not Connected",
+    ),
+    "printerNotConnectedMessage": MessageLookupByLibrary.simpleMessage(
+      "You are not connected to a printer. Please connect a printer to print invoices.",
+    ),
+    "printerSettings": MessageLookupByLibrary.simpleMessage("Printer Settings"),
+    "printerType": MessageLookupByLibrary.simpleMessage("Printer Type"),
+    "printerTypeEscPos": MessageLookupByLibrary.simpleMessage(
+      "ESC/POS Bluetooth",
+    ),
+    "printerTypeNone": MessageLookupByLibrary.simpleMessage("None"),
+    "printerTypeSunmi": MessageLookupByLibrary.simpleMessage("Sunmi POS"),
+    "printers": MessageLookupByLibrary.simpleMessage("Printers"),
     "printing": MessageLookupByLibrary.simpleMessage("Printing..."),
     "processingLogout": MessageLookupByLibrary.simpleMessage(
       "Processing logout...",
@@ -314,14 +424,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "qrCodeRequired": MessageLookupByLibrary.simpleMessage(
       "QR Code is required to complete this invoice",
     ),
+    "ready": MessageLookupByLibrary.simpleMessage("Ready"),
     "refresh": MessageLookupByLibrary.simpleMessage("Refresh"),
     "remove": MessageLookupByLibrary.simpleMessage("Remove"),
+    "reprintReceipt": MessageLookupByLibrary.simpleMessage("Reprint Receipt"),
+    "reprintTicket": MessageLookupByLibrary.simpleMessage("Reprint Ticket"),
     "requestCar": MessageLookupByLibrary.simpleMessage("Request Car"),
     "requiredField": MessageLookupByLibrary.simpleMessage(
       "This field is required",
     ),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "save": MessageLookupByLibrary.simpleMessage("Save"),
+    "scanDevices": MessageLookupByLibrary.simpleMessage("Scan Devices"),
+    "scanError": MessageLookupByLibrary.simpleMessage("Scan error"),
     "scanQrCode": MessageLookupByLibrary.simpleMessage("Scan QR Code"),
     "scanQrCodeInstructions": MessageLookupByLibrary.simpleMessage(
       "Position QR Code within the frame to scan",
@@ -329,9 +444,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "scanQrToComplete": MessageLookupByLibrary.simpleMessage(
       "You must scan QR Code to complete the invoice",
     ),
+    "scanning": MessageLookupByLibrary.simpleMessage("Scanning..."),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "searchByCarNumber": MessageLookupByLibrary.simpleMessage(
       "Search by car number",
+    ),
+    "searchingForPrinters": MessageLookupByLibrary.simpleMessage(
+      "Searching for printers...",
+    ),
+    "selectPrinterType": MessageLookupByLibrary.simpleMessage(
+      "Select Printer Type",
     ),
     "sessionEndError": MessageLookupByLibrary.simpleMessage(
       "Error ending active session",
@@ -347,6 +469,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Sign in to continue",
     ),
     "simpleLogout": MessageLookupByLibrary.simpleMessage("Logout"),
+    "sliceHeight": MessageLookupByLibrary.simpleMessage("Slice Height"),
     "startBalance": MessageLookupByLibrary.simpleMessage("Start balance"),
     "startBalanceRequired": MessageLookupByLibrary.simpleMessage(
       "Start balance is required",
@@ -357,14 +480,25 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "startSession": MessageLookupByLibrary.simpleMessage("Start Session"),
     "startTime": MessageLookupByLibrary.simpleMessage("Start Time"),
+    "stop": MessageLookupByLibrary.simpleMessage("Stop"),
     "success": MessageLookupByLibrary.simpleMessage("Success"),
+    "sunmiPrintError": MessageLookupByLibrary.simpleMessage(
+      "Sunmi print error",
+    ),
+    "system": MessageLookupByLibrary.simpleMessage("System"),
     "systemName": MessageLookupByLibrary.simpleMessage("System Name"),
     "terminate": MessageLookupByLibrary.simpleMessage("Terminate Daily"),
     "terminateDaily": MessageLookupByLibrary.simpleMessage("Terminate Daily"),
     "terminateDailyAndLogout": MessageLookupByLibrary.simpleMessage(
       "Terminate Daily and Logout",
     ),
+    "testPrint": MessageLookupByLibrary.simpleMessage("Test Print"),
+    "testPrintSuccess": MessageLookupByLibrary.simpleMessage(
+      "Test print successful",
+    ),
+    "theme": MessageLookupByLibrary.simpleMessage("Theme"),
     "timeElapsed": MessageLookupByLibrary.simpleMessage("Time Elapsed"),
+    "unknown": MessageLookupByLibrary.simpleMessage("Unknown"),
     "unpaid": MessageLookupByLibrary.simpleMessage("Unpaid"),
     "userNotAuthenticated": MessageLookupByLibrary.simpleMessage(
       "User not authenticated",

@@ -6,9 +6,10 @@ import 'package:parkingtec/core/routing/routes.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/core/widgets/back_button_widget.dart';
 import 'package:parkingtec/core/widgets/qr_scanner_widget.dart';
-import 'package:parkingtec/features/invoice/data/models/invoice.dart';
 import 'package:parkingtec/features/invoice/presentation/pages/create_invoice_dialog.dart';
-import 'package:parkingtec/features/invoice/presentation/states/invoice_state.dart';
+import 'package:parkingtec/features/invoice/presentation/states/active_invoices_state.dart';
+import 'package:parkingtec/features/invoice/presentation/states/all_invoices_state.dart';
+import 'package:parkingtec/features/invoice/presentation/states/pending_invoices_state.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/invoice_list_widget.dart';
 import 'package:parkingtec/features/invoice/providers/invoice_providers.dart';
 import 'package:parkingtec/generated/l10n.dart';
@@ -32,52 +33,54 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
-
-    // Load all invoice lists on init only if state is initial
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentState = ref.read(invoiceControllerProvider);
-      // Only load if state is initial (not already loaded)
-      if (currentState.maybeWhen(
-        initial: () => true,
-        orElse: () => false,
-      )) {
-        ref.read(invoiceControllerProvider.notifier).loadAllInvoiceLists();
-      }
-    });
   }
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
       // Check if data is already loaded before reloading
-      final currentState = ref.read(invoiceControllerProvider);
-      final hasData = currentState.maybeWhen(
-        loaded: (all, active, pending, _, __) {
-          switch (_tabController.index) {
-            case 0:
-              return all.isNotEmpty;
-            case 1:
-              return active.isNotEmpty;
-            case 2:
-              return pending.isNotEmpty;
-            default:
-              return false;
-          }
-        },
-        orElse: () => false,
-      );
+      bool hasData = false;
+      switch (_tabController.index) {
+        case 0:
+          hasData = ref
+              .read(allInvoicesControllerProvider)
+              .maybeWhen(
+                loaded: (invoices, _) => invoices.isNotEmpty,
+                orElse: () => false,
+              );
+          break;
+        case 1:
+          hasData = ref
+              .read(activeInvoicesControllerProvider)
+              .maybeWhen(
+                loaded: (invoices, _) => invoices.isNotEmpty,
+                orElse: () => false,
+              );
+          break;
+        case 2:
+          hasData = ref
+              .read(pendingInvoicesControllerProvider)
+              .maybeWhen(
+                loaded: (invoices, _) => invoices.isNotEmpty,
+                orElse: () => false,
+              );
+          break;
+      }
 
       // Only reload if no data exists for current tab
       if (!hasData) {
-        final controller = ref.read(invoiceControllerProvider.notifier);
         switch (_tabController.index) {
           case 0:
-            controller.loadAllInvoices();
+            ref.read(allInvoicesControllerProvider.notifier).loadAllInvoices();
             break;
           case 1:
-            controller.loadActiveInvoices();
+            ref
+                .read(activeInvoicesControllerProvider.notifier)
+                .loadActiveInvoices();
             break;
           case 2:
-            controller.loadPendingInvoices();
+            ref
+                .read(pendingInvoicesControllerProvider.notifier)
+                .loadPendingInvoices();
             break;
         }
       }
@@ -125,32 +128,93 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
   }
 
   void _handleSearch(String query) {
-    final controller = ref.read(invoiceControllerProvider.notifier);
     if (query.isEmpty) {
-      // Reload current tab
+      // Clear search - show all loaded invoices
       switch (_tabController.index) {
         case 0:
-          controller.loadAllInvoices();
+          ref.read(allInvoicesControllerProvider.notifier).clearSearch();
           break;
         case 1:
-          controller.loadActiveInvoices();
+          ref.read(activeInvoicesControllerProvider.notifier).clearSearch();
           break;
         case 2:
-          controller.loadPendingInvoices();
+          ref.read(pendingInvoicesControllerProvider.notifier).clearSearch();
           break;
       }
     } else {
-      // Search in all invoices
-      controller.searchInvoices(query);
+      // Search in already loaded invoices only
+      switch (_tabController.index) {
+        case 0:
+          ref
+              .read(allInvoicesControllerProvider.notifier)
+              .searchInLoadedInvoices(query);
+          break;
+        case 1:
+          ref
+              .read(activeInvoicesControllerProvider.notifier)
+              .searchInLoadedInvoices(query);
+          break;
+        case 2:
+          ref
+              .read(pendingInvoicesControllerProvider.notifier)
+              .searchInLoadedInvoices(query);
+          break;
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final invoiceState = ref.watch(invoiceControllerProvider);
+    // Watch specific controllers based on current tab
+    final allInvoicesState = ref.watch(allInvoicesControllerProvider);
+    final activeInvoicesState = ref.watch(activeInvoicesControllerProvider);
+    final pendingInvoicesState = ref.watch(pendingInvoicesControllerProvider);
 
-    // Listen for errors
-    ref.listen<InvoiceState>(invoiceControllerProvider, (previous, next) {
+    // Listen for errors from all controllers
+    ref.listen<AllInvoicesState>(allInvoicesControllerProvider, (
+      previous,
+      next,
+    ) {
+      next.maybeWhen(
+        error: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                failure.message,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        },
+        orElse: () {},
+      );
+    });
+
+    ref.listen<ActiveInvoicesState>(activeInvoicesControllerProvider, (
+      previous,
+      next,
+    ) {
+      next.maybeWhen(
+        error: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                failure.message,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        },
+        orElse: () {},
+      );
+    });
+
+    ref.listen<PendingInvoicesState>(pendingInvoicesControllerProvider, (
+      previous,
+      next,
+    ) {
       next.maybeWhen(
         error: (failure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -174,17 +238,17 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
         title: Text(
           S.of(context).invoices,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryX(context),
-              ),
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryX(context),
+          ),
         ),
         backgroundColor: AppColors.background(context),
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.primaryX(context),
           unselectedLabelColor: AppColors.textSecondary(context),
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.primaryX(context),
           tabs: [
             Tab(text: S.of(context).allInvoices),
             Tab(text: S.of(context).activeInvoices),
@@ -200,15 +264,6 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
             ),
             onPressed: _showQrScanner,
             tooltip: S.of(context).scanQrCode,
-          ),
-          // Create Invoice Button
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: AppColors.primaryX(context),
-            ),
-            onPressed: _showCreateInvoiceDialog,
-            tooltip: S.of(context).createInvoice,
           ),
         ],
       ),
@@ -270,42 +325,12 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: invoiceState.when(
-                      initial: () => _buildLoadingState(context),
-                      loading: () => _buildLoadingState(context),
-                      loaded: (all, active, pending, current, query) {
-                        // Filter invoices based on current tab
-                        List<Invoice> displayedInvoices;
-                        String emptyMessage;
-
-                        switch (_tabController.index) {
-                          case 0:
-                            displayedInvoices = all;
-                            emptyMessage = S.of(context).noInvoices;
-                            break;
-                          case 1:
-                            displayedInvoices = active;
-                            emptyMessage = S.of(context).noActiveInvoices;
-                            break;
-                          case 2:
-                            displayedInvoices = pending;
-                            emptyMessage = S.of(context).noPendingInvoices;
-                            break;
-                          default:
-                            displayedInvoices = all;
-                            emptyMessage = S.of(context).noInvoices;
-                        }
-
-                        return InvoiceListWidget(
-                          invoices: displayedInvoices,
-                          onRefresh: () {
-                            ref.read(invoiceControllerProvider.notifier).refreshInvoices();
-                          },
-                          emptyMessage: emptyMessage,
-                          isTablet: isTablet,
-                        );
-                      },
-                      error: (failure) => _buildErrorState(context, failure.message),
+                    child: _buildTabContent(
+                      context,
+                      allInvoicesState,
+                      activeInvoicesState,
+                      pendingInvoicesState,
+                      isTablet,
                     ),
                   ),
                 ),
@@ -314,6 +339,120 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
           );
         },
       ),
+      floatingActionButton: RepaintBoundary(
+        child: FloatingActionButton(
+          onPressed: _showCreateInvoiceDialog,
+          backgroundColor: AppColors.backgroundX(context),
+          child: Icon(Icons.add, color: AppColors.background(context)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabContent(
+    BuildContext context,
+    AllInvoicesState allInvoicesState,
+    ActiveInvoicesState activeInvoicesState,
+    PendingInvoicesState pendingInvoicesState,
+    bool isTablet,
+  ) {
+    switch (_tabController.index) {
+      case 0:
+        return allInvoicesState.when(
+          initial: () => _buildEmptyState(context, S.of(context).noInvoices, 0),
+          loading: () => _buildLoadingState(context),
+          loaded: (invoices, _) => InvoiceListWidget(
+            invoices: invoices,
+            onRefresh: () {
+              ref
+                  .read(allInvoicesControllerProvider.notifier)
+                  .loadAllInvoices();
+            },
+            onLoadRequested: () {
+              ref
+                  .read(allInvoicesControllerProvider.notifier)
+                  .loadAllInvoices();
+            },
+            emptyMessage: S.of(context).noInvoices,
+            isTablet: isTablet,
+          ),
+          error: (failure) => _buildErrorState(context, failure.message, 0),
+        );
+      case 1:
+        return activeInvoicesState.when(
+          initial: () =>
+              _buildEmptyState(context, S.of(context).noActiveInvoices, 1),
+          loading: () => _buildLoadingState(context),
+          loaded: (invoices, _) => InvoiceListWidget(
+            invoices: invoices,
+            onRefresh: () {
+              ref
+                  .read(activeInvoicesControllerProvider.notifier)
+                  .loadActiveInvoices();
+            },
+            onLoadRequested: () {
+              ref
+                  .read(activeInvoicesControllerProvider.notifier)
+                  .loadActiveInvoices();
+            },
+            emptyMessage: S.of(context).noActiveInvoices,
+            isTablet: isTablet,
+          ),
+          error: (failure) => _buildErrorState(context, failure.message, 1),
+        );
+      case 2:
+        return pendingInvoicesState.when(
+          initial: () =>
+              _buildEmptyState(context, S.of(context).noPendingInvoices, 2),
+          loading: () => _buildLoadingState(context),
+          loaded: (invoices, _) => InvoiceListWidget(
+            invoices: invoices,
+            onRefresh: () {
+              ref
+                  .read(pendingInvoicesControllerProvider.notifier)
+                  .loadPendingInvoices();
+            },
+            onLoadRequested: () {
+              ref
+                  .read(pendingInvoicesControllerProvider.notifier)
+                  .loadPendingInvoices();
+            },
+            emptyMessage: S.of(context).noPendingInvoices,
+            isTablet: isTablet,
+          ),
+          error: (failure) => _buildErrorState(context, failure.message, 2),
+        );
+      default:
+        return _buildEmptyState(context, S.of(context).noInvoices, 0);
+    }
+  }
+
+  Widget _buildEmptyState(
+    BuildContext context,
+    String emptyMessage,
+    int tabIndex,
+  ) {
+    return InvoiceListWidget(
+      invoices: const [],
+      onLoadRequested: () {
+        switch (tabIndex) {
+          case 0:
+            ref.read(allInvoicesControllerProvider.notifier).loadAllInvoices();
+            break;
+          case 1:
+            ref
+                .read(activeInvoicesControllerProvider.notifier)
+                .loadActiveInvoices();
+            break;
+          case 2:
+            ref
+                .read(pendingInvoicesControllerProvider.notifier)
+                .loadPendingInvoices();
+            break;
+        }
+      },
+      emptyMessage: emptyMessage,
+      isTablet: false,
     );
   }
 
@@ -329,38 +468,54 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
           Text(
             S.of(context).loadingInvoices,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary(context),
-                ),
+              color: AppColors.textSecondary(context),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorState(BuildContext context, String errorMessage) {
+  Widget _buildErrorState(
+    BuildContext context,
+    String errorMessage,
+    int tabIndex,
+  ) {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64.w,
-              color: AppColors.error,
-            ),
+            Icon(Icons.error_outline, size: 64.w, color: AppColors.error),
             SizedBox(height: 16.h),
             Text(
               errorMessage,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.error,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: AppColors.error),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
-                ref.read(invoiceControllerProvider.notifier).refreshInvoices();
+                switch (tabIndex) {
+                  case 0:
+                    ref
+                        .read(allInvoicesControllerProvider.notifier)
+                        .loadAllInvoices();
+                    break;
+                  case 1:
+                    ref
+                        .read(activeInvoicesControllerProvider.notifier)
+                        .loadActiveInvoices();
+                    break;
+                  case 2:
+                    ref
+                        .read(pendingInvoicesControllerProvider.notifier)
+                        .loadPendingInvoices();
+                    break;
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -374,4 +529,3 @@ class _InvoiceListPageState extends ConsumerState<InvoiceListPage>
     );
   }
 }
-

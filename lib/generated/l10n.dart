@@ -329,9 +329,39 @@ class S {
     return Intl.message('Car Number', name: 'carNumber', desc: '', args: []);
   }
 
+  /// `Car number is required`
+  String get carNumberRequired {
+    return Intl.message(
+      'Car number is required',
+      name: 'carNumberRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Car Model`
   String get carModel {
     return Intl.message('Car Model', name: 'carModel', desc: '', args: []);
+  }
+
+  /// `Car Model (Optional)`
+  String get carModelOptional {
+    return Intl.message(
+      'Car Model (Optional)',
+      name: 'carModelOptional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Customer Name (Optional)`
+  String get customerNameOptional {
+    return Intl.message(
+      'Customer Name (Optional)',
+      name: 'customerNameOptional',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Car Color`
@@ -404,6 +434,16 @@ class S {
     );
   }
 
+  /// `Amount will be calculated based on hourly rate when invoice is completed`
+  String get amountWillBeCalculated {
+    return Intl.message(
+      'Amount will be calculated based on hourly rate when invoice is completed',
+      name: 'amountWillBeCalculated',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Invoice printed successfully`
   String get invoicePrintedSuccess {
     return Intl.message(
@@ -424,9 +464,9 @@ class S {
     );
   }
 
-  /// `Print Error`
+  /// `Print error`
   String get printError {
-    return Intl.message('Print Error', name: 'printError', desc: '', args: []);
+    return Intl.message('Print error', name: 'printError', desc: '', args: []);
   }
 
   /// `Invoice History`
@@ -1044,14 +1084,9 @@ class S {
     );
   }
 
-  /// `App Configuration`
+  /// `App Config`
   String get appConfig {
-    return Intl.message(
-      'App Configuration',
-      name: 'appConfig',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('App Config', name: 'appConfig', desc: '', args: []);
   }
 
   /// `System Name`
@@ -1494,6 +1529,16 @@ class S {
     );
   }
 
+  /// `Load Invoices`
+  String get loadInvoices {
+    return Intl.message(
+      'Load Invoices',
+      name: 'loadInvoices',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Error loading invoices`
   String get invoiceError {
     return Intl.message(
@@ -1604,6 +1649,541 @@ class S {
     return Intl.message(
       'Clear search',
       name: 'clearSearch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Printer Settings`
+  String get printerSettings {
+    return Intl.message(
+      'Printer Settings',
+      name: 'printerSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Printer Type`
+  String get printerType {
+    return Intl.message(
+      'Printer Type',
+      name: 'printerType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sunmi POS`
+  String get printerTypeSunmi {
+    return Intl.message(
+      'Sunmi POS',
+      name: 'printerTypeSunmi',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ESC/POS Bluetooth`
+  String get printerTypeEscPos {
+    return Intl.message(
+      'ESC/POS Bluetooth',
+      name: 'printerTypeEscPos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `None`
+  String get printerTypeNone {
+    return Intl.message('None', name: 'printerTypeNone', desc: '', args: []);
+  }
+
+  /// `Paper Width`
+  String get paperWidth {
+    return Intl.message('Paper Width', name: 'paperWidth', desc: '', args: []);
+  }
+
+  /// `Auto Print Options`
+  String get autoPrintOptions {
+    return Intl.message(
+      'Auto Print Options',
+      name: 'autoPrintOptions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto Print on Create`
+  String get autoPrintOnCreate {
+    return Intl.message(
+      'Auto Print on Create',
+      name: 'autoPrintOnCreate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Automatically print entry ticket when invoice is created`
+  String get autoPrintOnCreateDesc {
+    return Intl.message(
+      'Automatically print entry ticket when invoice is created',
+      name: 'autoPrintOnCreateDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto Print on Complete`
+  String get autoPrintOnComplete {
+    return Intl.message(
+      'Auto Print on Complete',
+      name: 'autoPrintOnComplete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Automatically print exit receipt when invoice is completed`
+  String get autoPrintOnCompleteDesc {
+    return Intl.message(
+      'Automatically print exit receipt when invoice is completed',
+      name: 'autoPrintOnCompleteDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Test Print`
+  String get testPrint {
+    return Intl.message('Test Print', name: 'testPrint', desc: '', args: []);
+  }
+
+  /// `Test print successful`
+  String get testPrintSuccess {
+    return Intl.message(
+      'Test print successful',
+      name: 'testPrintSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reprint Ticket`
+  String get reprintTicket {
+    return Intl.message(
+      'Reprint Ticket',
+      name: 'reprintTicket',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reprint Receipt`
+  String get reprintReceipt {
+    return Intl.message(
+      'Reprint Receipt',
+      name: 'reprintReceipt',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected`
+  String get connected {
+    return Intl.message('Connected', name: 'connected', desc: '', args: []);
+  }
+
+  /// `Disconnected`
+  String get disconnected {
+    return Intl.message(
+      'Disconnected',
+      name: 'disconnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connect`
+  String get connect {
+    return Intl.message('Connect', name: 'connect', desc: '', args: []);
+  }
+
+  /// `Disconnect`
+  String get disconnect {
+    return Intl.message('Disconnect', name: 'disconnect', desc: '', args: []);
+  }
+
+  /// `Printers`
+  String get printers {
+    return Intl.message('Printers', name: 'printers', desc: '', args: []);
+  }
+
+  /// `Stop`
+  String get stop {
+    return Intl.message('Stop', name: 'stop', desc: '', args: []);
+  }
+
+  /// `Unknown`
+  String get unknown {
+    return Intl.message('Unknown', name: 'unknown', desc: '', args: []);
+  }
+
+  /// `Searching for printers...`
+  String get searchingForPrinters {
+    return Intl.message(
+      'Searching for printers...',
+      name: 'searchingForPrinters',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected printer shown at top`
+  String get connectedPrinterShownAtTop {
+    return Intl.message(
+      'Connected printer shown at top',
+      name: 'connectedPrinterShownAtTop',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No printers. Press search`
+  String get noPrintersPressSearch {
+    return Intl.message(
+      'No printers. Press search',
+      name: 'noPrintersPressSearch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected Printer`
+  String get connectedPrinter {
+    return Intl.message(
+      'Connected Printer',
+      name: 'connectedPrinter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enable Bluetooth`
+  String get pleaseEnableBluetooth {
+    return Intl.message(
+      'Please enable Bluetooth',
+      name: 'pleaseEnableBluetooth',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invoice Language`
+  String get invoiceLanguage {
+    return Intl.message(
+      'Invoice Language',
+      name: 'invoiceLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Slice Height`
+  String get sliceHeight {
+    return Intl.message(
+      'Slice Height',
+      name: 'sliceHeight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Print Settings`
+  String get printSettings {
+    return Intl.message(
+      'Print Settings',
+      name: 'printSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Preview`
+  String get previewLabel {
+    return Intl.message('Preview', name: 'previewLabel', desc: '', args: []);
+  }
+
+  /// `App Settings`
+  String get appSettings {
+    return Intl.message(
+      'App Settings',
+      name: 'appSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme`
+  String get theme {
+    return Intl.message('Theme', name: 'theme', desc: '', args: []);
+  }
+
+  /// `Light`
+  String get light {
+    return Intl.message('Light', name: 'light', desc: '', args: []);
+  }
+
+  /// `Dark`
+  String get dark {
+    return Intl.message('Dark', name: 'dark', desc: '', args: []);
+  }
+
+  /// `System`
+  String get system {
+    return Intl.message('System', name: 'system', desc: '', args: []);
+  }
+
+  /// `Language`
+  String get language {
+    return Intl.message('Language', name: 'language', desc: '', args: []);
+  }
+
+  /// `Preparing invoice...`
+  String get preparingInvoice {
+    return Intl.message(
+      'Preparing invoice...',
+      name: 'preparingInvoice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Printer Type`
+  String get selectPrinterType {
+    return Intl.message(
+      'Select Printer Type',
+      name: 'selectPrinterType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connection Status`
+  String get connectionStatus {
+    return Intl.message(
+      'Connection Status',
+      name: 'connectionStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not Connected`
+  String get notConnected {
+    return Intl.message(
+      'Not Connected',
+      name: 'notConnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scanning...`
+  String get scanning {
+    return Intl.message('Scanning...', name: 'scanning', desc: '', args: []);
+  }
+
+  /// `Scan Devices`
+  String get scanDevices {
+    return Intl.message(
+      'Scan Devices',
+      name: 'scanDevices',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan error`
+  String get scanError {
+    return Intl.message('Scan error', name: 'scanError', desc: '', args: []);
+  }
+
+  /// `Available Devices`
+  String get availableDevices {
+    return Intl.message(
+      'Available Devices',
+      name: 'availableDevices',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected Device`
+  String get connectedDevice {
+    return Intl.message(
+      'Connected Device',
+      name: 'connectedDevice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ready`
+  String get ready {
+    return Intl.message('Ready', name: 'ready', desc: '', args: []);
+  }
+
+  /// `Not Initialized`
+  String get notInitialized {
+    return Intl.message(
+      'Not Initialized',
+      name: 'notInitialized',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Initialize Printer`
+  String get initializePrinter {
+    return Intl.message(
+      'Initialize Printer',
+      name: 'initializePrinter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Printer initialized`
+  String get printerInitialized {
+    return Intl.message(
+      'Printer initialized',
+      name: 'printerInitialized',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Print sent`
+  String get printSent {
+    return Intl.message('Print sent', name: 'printSent', desc: '', args: []);
+  }
+
+  /// `Connected to {deviceName}`
+  String connectedToDevice(String deviceName) {
+    return Intl.message(
+      'Connected to $deviceName',
+      name: 'connectedToDevice',
+      desc: '',
+      args: [deviceName],
+    );
+  }
+
+  /// `Connection failed`
+  String get connectionFailed {
+    return Intl.message(
+      'Connection failed',
+      name: 'connectionFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No printer connected. Please connect a printer first.`
+  String get noPrinterConnected {
+    return Intl.message(
+      'No printer connected. Please connect a printer first.',
+      name: 'noPrinterConnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sunmi print error`
+  String get sunmiPrintError {
+    return Intl.message(
+      'Sunmi print error',
+      name: 'sunmiPrintError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bluetooth print error`
+  String get bluetoothPrintError {
+    return Intl.message(
+      'Bluetooth print error',
+      name: 'bluetoothPrintError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bluetooth printer not connected`
+  String get bluetoothPrinterNotConnected {
+    return Intl.message(
+      'Bluetooth printer not connected',
+      name: 'bluetoothPrinterNotConnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please connect to a printer first`
+  String get pleaseConnectToPrinterFirst {
+    return Intl.message(
+      'Please connect to a printer first',
+      name: 'pleaseConnectToPrinterFirst',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bluetooth test print - implement ESC/POS commands`
+  String get bluetoothTestPrintNotImplemented {
+    return Intl.message(
+      'Bluetooth test print - implement ESC/POS commands',
+      name: 'bluetoothTestPrintNotImplemented',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Printer Not Connected`
+  String get printerNotConnected {
+    return Intl.message(
+      'Printer Not Connected',
+      name: 'printerNotConnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You are not connected to a printer. Please connect a printer to print invoices.`
+  String get printerNotConnectedMessage {
+    return Intl.message(
+      'You are not connected to a printer. Please connect a printer to print invoices.',
+      name: 'printerNotConnectedMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Go to Settings`
+  String get goToSettings {
+    return Intl.message(
+      'Go to Settings',
+      name: 'goToSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue without printing`
+  String get continueWithoutPrinting {
+    return Intl.message(
+      'Continue without printing',
+      name: 'continueWithoutPrinting',
       desc: '',
       args: [],
     );

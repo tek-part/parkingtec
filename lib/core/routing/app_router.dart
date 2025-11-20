@@ -16,6 +16,8 @@ import 'package:parkingtec/features/vehicle/presentation/pages/vehicle_entry_pag
 import 'package:parkingtec/features/config/presentation/pages/config_page.dart';
 import 'package:parkingtec/features/invoice/presentation/pages/invoice_details_page.dart';
 import 'package:parkingtec/features/invoice/presentation/pages/invoice_list_page.dart';
+import 'package:parkingtec/features/printing/presentation/pages/printer_settings_page.dart';
+import 'package:parkingtec/features/settings/presentation/pages/settings_page.dart';
 
 class AppRouter {
   static GoRouter createRouter() {
@@ -89,6 +91,18 @@ class AppRouter {
               const ConfigPage(),
         ),
         GoRoute(
+          path: Routes.settings,
+          builder: (BuildContext context, GoRouterState state) {
+            // Get initialTab from extra or query parameter
+            final extra = state.extra as Map<String, dynamic>?;
+            final initialTab = extra?['initialTab'] as int? ??
+                (state.uri.queryParameters['tab'] != null
+                    ? int.tryParse(state.uri.queryParameters['tab']!)
+                    : null);
+            return SettingsPage(initialTab: initialTab);
+          },
+        ),
+        GoRoute(
           path: Routes.invoices,
           builder: (BuildContext context, GoRouterState state) =>
               const InvoiceListPage(),
@@ -102,6 +116,11 @@ class AppRouter {
             }
             return InvoiceDetailsPage(invoiceId: id);
           },
+        ),
+        GoRoute(
+          path: Routes.printerSettings,
+          builder: (BuildContext context, GoRouterState state) =>
+              const PrinterSettingsPage(),
         ),
       ],
     );
