@@ -345,7 +345,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                                 )) ...[
                                   SizedBox(height: 16.h),
                                   Text(
-                                    'Checking authentication...',
+                                    S.of(context).checkingAuthentication,
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           color: AppColors.textSecondary(
@@ -360,7 +360,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                                 )) ...[
                                   SizedBox(height: 16.h),
                                   Text(
-                                    'Connection error. Retrying...',
+                                    S.of(context).connectionErrorRetrying,
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(color: AppColors.error),
                                   ),

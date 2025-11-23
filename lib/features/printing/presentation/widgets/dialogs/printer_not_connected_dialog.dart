@@ -28,33 +28,27 @@ class PrinterNotConnectedDialog extends ConsumerWidget {
     final s = S.of(context);
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       title: Row(
         children: [
-          Icon(
-            Icons.print_disabled,
-            color: AppColors.error,
-            size: 24.w,
-          ),
+          Icon(Icons.print_disabled, color: AppColors.error, size: 24.w),
           SizedBox(width: 12.w),
           Expanded(
             child: Text(
               s.printerNotConnected,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: AppColors.error,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
       ),
       content: Text(
         s.printerNotConnectedMessage,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textPrimary(context),
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary(context)),
       ),
       actions: [
         // Cancel button
@@ -74,7 +68,7 @@ class PrinterNotConnectedDialog extends ConsumerWidget {
           child: Text(
             s.continueWithoutPrinting,
             style: TextStyle(
-              color: AppColors.primary,
+              color: AppColors.primaryX(context),
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -83,12 +77,11 @@ class PrinterNotConnectedDialog extends ConsumerWidget {
         // Go to Settings button
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop(null); // Return null to indicate navigation
+            Navigator.of(
+              context,
+            ).pop(null); // Return null to indicate navigation
             // Navigate to settings with printer tab (index 0)
-            context.push(
-              Routes.settings,
-              extra: {'initialTab': 0},
-            );
+            context.push(Routes.settings, extra: {'initialTab': 0});
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -99,14 +92,10 @@ class PrinterNotConnectedDialog extends ConsumerWidget {
           ),
           child: Text(
             s.goToSettings,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
           ),
         ),
       ],
     );
   }
 }
-

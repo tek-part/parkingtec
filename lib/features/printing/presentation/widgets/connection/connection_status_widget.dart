@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
+import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/generated/l10n.dart';
 
 class ConnectionStatusWidget extends StatelessWidget {
   final bool isConnected;
-  final BluetoothDevice? connectedDevice;
+  final PrinterDevice? connectedDevice;
   final VoidCallback? onDisconnect;
 
   const ConnectionStatusWidget({
@@ -23,10 +23,7 @@ class ConnectionStatusWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.border(context),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.border(context), width: 1),
       ),
       child: Row(
         children: [
@@ -47,15 +44,13 @@ class ConnectionStatusWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: isConnected
-                        ? AppColors.success
-                        : AppColors.error,
+                    color: isConnected ? AppColors.success : AppColors.error,
                   ),
                 ),
                 if (connectedDevice != null)
                   Text(
                     connectedDevice!.name.isEmpty
-                        ? connectedDevice!.address
+                        ? (connectedDevice!.address ?? '')
                         : connectedDevice!.name,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -70,13 +65,10 @@ class ConnectionStatusWidget extends StatelessWidget {
               onPressed: onDisconnect,
               icon: const Icon(Icons.close),
               label: Text(S.of(context).disconnect),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
             ),
         ],
       ),
     );
   }
 }
-

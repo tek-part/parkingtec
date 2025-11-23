@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/core/storage/preferences_storage.dart';
 
 /// Theme Notifier
@@ -73,8 +74,7 @@ class LanguageNotifier extends StateNotifier<String> {
 
 /// Theme Notifier Provider
 /// Provides theme mode state management
-final themeNotifierProvider =
-    StateNotifierProvider<ThemeNotifier, ThemeMode>(
+final themeNotifierProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>(
   (ref) => ThemeNotifier(),
 );
 
@@ -82,6 +82,5 @@ final themeNotifierProvider =
 /// Provides language state management
 final languageNotifierProvider =
     StateNotifierProvider<LanguageNotifier, String>(
-  (ref) => LanguageNotifier(),
-);
-
+      (ref) => LanguageNotifier(),
+    );

@@ -176,6 +176,8 @@
   "unpaid": "Unpaid",
   "endInvoice": "End Invoice",
   "completeInvoice": "Complete Invoice",
+  "completingInvoice": "Completing invoice...",
+  "completeWithQr": "Complete with QR",
   "payInvoice": "Pay Invoice",
   "pickupInvoice": "Pickup Invoice",
   "invoiceCompleted": "Invoice completed successfully",
@@ -277,5 +279,7 @@
   "printerNotConnectedMessage": "You are not connected to a printer. Please connect a printer to print invoices.",
   "goToSettings": "Go to Settings",
   "continueWithoutPrinting": "Continue without printing",
-  "printInvoice": "Print Invoice"
+  "printInvoice": "Print Invoice",
+  "checkingAuthentication": "Checking authentication...",
+  "connectionErrorRetrying": "Connection error. Retrying..."
 }

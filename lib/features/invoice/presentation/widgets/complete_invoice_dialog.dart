@@ -10,6 +10,7 @@ import 'package:parkingtec/features/invoice/data/models/requests/complete_invoic
 import 'package:parkingtec/features/invoice/presentation/states/complete_invoice_state.dart';
 import 'package:parkingtec/features/invoice/providers/invoice_providers.dart';
 import 'package:parkingtec/features/printing/presentation/widgets/dialogs/printer_not_connected_dialog.dart';
+import 'package:parkingtec/features/printing/providers/printing_providers.dart';
 import 'package:parkingtec/features/printing/utils/printer_connection_helper.dart';
 import 'package:parkingtec/generated/l10n.dart';
 
@@ -43,8 +44,8 @@ class _CompleteInvoiceDialogState extends ConsumerState<CompleteInvoiceDialog> {
     double? calculatedAmount;
 
     if (widget.invoice.isHourlyPricing) {
-      // For hourly pricing: calculate from hourlyRate × hours
-      calculatedAmount = InvoiceTimer.calculateCurrentAmount(widget.invoice);
+      // For hourly pricing: calculate from hourlyRate × actual hours (without rounding up)
+      calculatedAmount = InvoiceTimer.calculateCurrentAmountActual(widget.invoice);
     } else if (widget.invoice.isFixedPricing) {
       // For fixed pricing: use amount or defaultFixedPrice
       calculatedAmount = widget.invoice.amount;
@@ -156,8 +157,23 @@ class _CompleteInvoiceDialogState extends ConsumerState<CompleteInvoiceDialog> {
       next,
     ) {
       next.maybeWhen(
-        success: (invoice) {
+        success: (invoice) async {
           Navigator.of(context).pop();
+          
+          // Print exit receipt after successful completion
+          final isConnected = PrinterConnectionHelper.isPrinterConnected(ref);
+          if (isConnected) {
+            try {
+              final appConfig = ref.read(appConfigProvider);
+              if (appConfig != null) {
+                final printUseCase = ref.read(printInvoiceOnCompleteUseCaseProvider);
+                await printUseCase.printExitReceipt(invoice, appConfig.toModel());
+              }
+            } catch (e) {
+              // Silently handle printing errors - don't block success message
+            }
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(

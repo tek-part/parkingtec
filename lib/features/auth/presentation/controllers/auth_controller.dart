@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/core/di/providers/usecase_providers.dart';
 import 'package:parkingtec/core/errors/failure.dart';
 import 'package:parkingtec/core/services/fcm_service.dart';
@@ -59,9 +60,10 @@ class AuthController extends StateNotifier<AuthState> {
           _safeSetState(AuthState.error(failure: failure));
         },
         (loginResponse) async {
-          if (loginResponse.token != null && loginResponse.user != null)
+          if (loginResponse.token != null && loginResponse.user != null) {
             // Save authentication token
             await SecureStorageService.saveToken(loginResponse.token!);
+          }
           if (_isDisposed) return;
 
           // Use user data from login response (includes active_daily)

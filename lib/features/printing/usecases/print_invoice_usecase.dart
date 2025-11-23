@@ -16,7 +16,21 @@ class PrintInvoiceUseCase {
     Invoice invoice,
     AppConfig appConfig,
   ) async {
-    return await printingService.printEntryTicket(invoice, appConfig);
+    try {
+      final success = await printingService.printEntryTicket(
+        invoice: invoice,
+        appConfig: appConfig,
+      );
+      if (success) {
+        return const Right(null);
+      } else {
+        return const Left(
+          ServerFailure('Print failed. Please check printer connection.'),
+        );
+      }
+    } catch (e) {
+      return Left(ServerFailure('Print error: ${e.toString()}'));
+    }
   }
 
   /// Print exit receipt
@@ -24,6 +38,20 @@ class PrintInvoiceUseCase {
     Invoice invoice,
     AppConfig appConfig,
   ) async {
-    return await printingService.printExitReceipt(invoice, appConfig);
+    try {
+      final success = await printingService.printExitReceipt(
+        invoice: invoice,
+        appConfig: appConfig,
+      );
+      if (success) {
+        return const Right(null);
+      } else {
+        return const Left(
+          ServerFailure('Print failed. Please check printer connection.'),
+        );
+      }
+    } catch (e) {
+      return Left(ServerFailure('Print error: ${e.toString()}'));
+    }
   }
 }

@@ -23,7 +23,7 @@ class _StartDailyPageState extends ConsumerState<StartDailyPage>
   late AnimationController _carAnimationController;
   late Animation<Offset> _carSlideAnimation;
 
-  final TextEditingController _startBalanceController = TextEditingController();
+  final TextEditingController _startBalanceController = TextEditingController(text: '0');
   final TextEditingController _notesController = TextEditingController();
 
   @override

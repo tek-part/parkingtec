@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/features/printing/presentation/pages/printer_settings_page.dart';
 
 /// Printer Settings Tab

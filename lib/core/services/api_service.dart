@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parkingtec/core/constants/api_endpoints.dart';
 import 'package:parkingtec/core/services/secure_storage_service.dart';
 import 'package:parkingtec/features/auth/data/models/requests/login_request.dart';
@@ -10,7 +11,6 @@ import 'package:parkingtec/features/daily/data/models/daily.dart';
 import 'package:parkingtec/features/daily/data/models/requests/start_daily_request.dart';
 import 'package:parkingtec/features/daily/data/models/requests/terminate_daily_request.dart';
 import 'package:parkingtec/features/config/data/models/responses/get_app_config_response.dart';
-import 'package:parkingtec/features/invoice/data/models/invoice.dart';
 import 'package:parkingtec/features/invoice/data/models/requests/complete_invoice_request.dart';
 import 'package:parkingtec/features/invoice/data/models/requests/create_invoice_request.dart';
 import 'package:parkingtec/features/invoice/data/models/requests/pay_invoice_request.dart';
@@ -24,7 +24,7 @@ part 'api_service.g.dart';
 
 /// API Service using Retrofit and Dio for HTTP requests
 /// Handles all API endpoints for the parking management system
-@RestApi(baseUrl: "https://parking.alwafierp.com/api")
+@RestApi(baseUrl: ApiEndpoints.baseUrl)
 abstract class ApiService {
   factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
 
@@ -80,11 +80,33 @@ abstract class ApiService {
           }
           handler.next(options);
         },
+        onResponse: (response, handler) {
+          // Log response before JSON parsing for debugging
+          if (kDebugMode) {
+            debugPrint('=== API RESPONSE ===');
+            debugPrint('URL: ${response.requestOptions.uri}');
+            debugPrint('Status Code: ${response.statusCode}');
+            debugPrint('Response Type: ${response.data.runtimeType}');
+            debugPrint('Response Data: ${response.data}');
+            debugPrint('===================');
+          }
+          handler.next(response);
+        },
         onError: (error, handler) async {
           // Handle 401 Unauthorized responses
           if (error.response?.statusCode == 401) {
             // Token expired, clear storage and redirect to login
             await SecureStorageService.clearAll();
+          }
+          // Log error details
+          if (kDebugMode) {
+            debugPrint('=== API ERROR ===');
+            debugPrint('URL: ${error.requestOptions.uri}');
+            debugPrint('Type: ${error.type}');
+            debugPrint('Message: ${error.message}');
+            debugPrint('Response: ${error.response?.data}');
+            debugPrint('Status Code: ${error.response?.statusCode}');
+            debugPrint('================');
           }
           handler.next(error);
         },
@@ -92,6 +114,8 @@ abstract class ApiService {
     );
 
     // Add pretty logging interceptor for debugging
+    // Only in debug mode to avoid performance issues
+    if (kDebugMode) {
     _dio!.interceptors.add(
       PrettyDioLogger(
         requestHeader: true,
@@ -99,9 +123,14 @@ abstract class ApiService {
         responseBody: true,
         responseHeader: false,
         error: true,
-        compact: true,
+          compact: false, // Change to false for more detailed logs
+          maxWidth: 90,
+          logPrint: (obj) {
+            debugPrint(obj.toString());
+          },
       ),
     );
+    }
   }
 
   // ==================== AUTHENTICATION ENDPOINTS ====================

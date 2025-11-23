@@ -1399,6 +1399,26 @@ class S {
     );
   }
 
+  /// `Completing invoice...`
+  String get completingInvoice {
+    return Intl.message(
+      'Completing invoice...',
+      name: 'completingInvoice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Complete with QR`
+  String get completeWithQr {
+    return Intl.message(
+      'Complete with QR',
+      name: 'completeWithQr',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Pay Invoice`
   String get payInvoice {
     return Intl.message('Pay Invoice', name: 'payInvoice', desc: '', args: []);
@@ -2184,6 +2204,26 @@ class S {
     return Intl.message(
       'Continue without printing',
       name: 'continueWithoutPrinting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checking authentication...`
+  String get checkingAuthentication {
+    return Intl.message(
+      'Checking authentication...',
+      name: 'checkingAuthentication',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connection error. Retrying...`
+  String get connectionErrorRetrying {
+    return Intl.message(
+      'Connection error. Retrying...',
+      name: 'connectionErrorRetrying',
       desc: '',
       args: [],
     );

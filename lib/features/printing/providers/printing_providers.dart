@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/features/printing/controllers/bluetooth_printer_controller.dart';
+import 'package:parkingtec/features/printing/controllers/pos_printer_controller.dart';
 import 'package:parkingtec/features/printing/controllers/sunmi_printer_controller.dart';
+import 'package:parkingtec/features/printing/services/pos_printer_service.dart';
 import 'package:parkingtec/features/printing/services/printing_service.dart';
 import 'package:parkingtec/features/printing/usecases/print_invoice_usecase.dart';
 import 'package:parkingtec/features/printing/usecases/reprint_invoice_usecase.dart';
@@ -29,11 +32,25 @@ final sunmiPrinterControllerProvider = Provider<SunmiPrinterController>((ref) {
   return SunmiPrinterController();
 });
 
+/// POS Printer Service Provider
+final posPrinterServiceProvider = Provider<PosPrinterService>((ref) {
+  return const PosPrinterService();
+});
+
+/// POS Printer Controller Provider
+final posPrinterControllerProvider = Provider<PosPrinterController>((ref) {
+  return PosPrinterController(
+    service: ref.read(posPrinterServiceProvider),
+    bluetoothController: ref.read(bluetoothPrinterControllerProvider),
+    sunmiController: ref.read(sunmiPrinterControllerProvider),
+  );
+});
+
 /// Printing Service Provider
 final printingServiceProvider = Provider<PrintingService>((ref) {
   return PrintingService(
+    posController: ref.read(posPrinterControllerProvider),
     bluetoothController: ref.read(bluetoothPrinterControllerProvider),
-    sunmiController: ref.read(sunmiPrinterControllerProvider),
   );
 });
 

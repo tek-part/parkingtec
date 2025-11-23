@@ -17,7 +17,8 @@ import 'package:parkingtec/features/invoice/domain/usecases/pay_invoice_usecase.
 import 'package:parkingtec/features/invoice/domain/usecases/pickup_invoice_usecase.dart';
 import 'package:parkingtec/features/invoice/domain/usecases/scan_invoice_usecase.dart';
 import 'package:parkingtec/features/invoice/domain/usecases/search_invoices_usecase.dart';
-import 'package:parkingtec/features/printing/providers/printing_providers.dart' as printing_providers;
+import 'package:parkingtec/features/printing/providers/printing_providers.dart'
+    as printing_providers;
 
 /// Use Case Providers
 
@@ -64,12 +65,16 @@ final getAllInvoicesUseCaseProvider = Provider<GetAllInvoicesUseCase>((ref) {
 });
 
 /// Get Active Invoices Use Case provider
-final getActiveInvoicesUseCaseProvider = Provider<GetActiveInvoicesUseCase>((ref) {
+final getActiveInvoicesUseCaseProvider = Provider<GetActiveInvoicesUseCase>((
+  ref,
+) {
   return GetActiveInvoicesUseCase(ref.read(invoiceRepositoryProvider));
 });
 
 /// Get Pending Invoices Use Case provider
-final getPendingInvoicesUseCaseProvider = Provider<GetPendingInvoicesUseCase>((ref) {
+final getPendingInvoicesUseCaseProvider = Provider<GetPendingInvoicesUseCase>((
+  ref,
+) {
   return GetPendingInvoicesUseCase(ref.read(invoiceRepositoryProvider));
 });
 
@@ -110,8 +115,11 @@ final searchInvoicesUseCaseProvider = Provider<SearchInvoicesUseCase>((ref) {
 
 /// Printing Use Case Providers
 /// Re-exported from printing_providers.dart for convenience
-final printInvoiceOnCreateUseCaseProvider = printing_providers.printInvoiceOnCreateUseCaseProvider;
+final printInvoiceOnCreateUseCaseProvider =
+    printing_providers.printInvoiceOnCreateUseCaseProvider;
 
-final printInvoiceOnCompleteUseCaseProvider = printing_providers.printInvoiceOnCompleteUseCaseProvider;
+final printInvoiceOnCompleteUseCaseProvider =
+    printing_providers.printInvoiceOnCompleteUseCaseProvider;
 
-final reprintInvoiceUseCaseProvider = printing_providers.reprintInvoiceUseCaseProvider;
+final reprintInvoiceUseCaseProvider =
+    printing_providers.reprintInvoiceUseCaseProvider;

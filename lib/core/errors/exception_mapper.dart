@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parkingtec/core/errors/failure.dart';
 
 /// Maps exceptions to Failures
@@ -11,10 +12,22 @@ class ExceptionMapper {
     if (exception is DioException) {
       return _mapDioException(exception);
     } else if (exception is FormatException) {
-      return const ValidationFailure('Invalid data format');
+      // إظهار تفاصيل أكثر عن الخطأ
+      debugPrint('=== FormatException Details ===');
+      debugPrint('Message: ${exception.message}');
+      debugPrint('Source: ${exception.source}');
+      debugPrint('Offset: ${exception.offset}');
+      debugPrint('==============================');
+      return ValidationFailure(
+        'Invalid data format: ${exception.message}',
+      );
     } else if (exception is Exception) {
+      debugPrint('Exception: ${exception.toString()}');
+      debugPrint('Type: ${exception.runtimeType}');
       return ServerFailure(exception.toString());
     } else {
+      debugPrint('Unknown error: ${exception.toString()}');
+      debugPrint('Type: ${exception.runtimeType}');
       return ServerFailure(exception.toString());
     }
   }
@@ -28,16 +41,34 @@ class ExceptionMapper {
         return const NetworkFailure('Connection timeout');
       case DioExceptionType.badResponse:
         final statusCode = exception.response?.statusCode ?? 0;
+        final responseData = exception.response?.data;
+        debugPrint('=== DioException badResponse ===');
+        debugPrint('Status Code: $statusCode');
+        debugPrint('Response Data: $responseData');
+        debugPrint('Response Type: ${responseData.runtimeType}');
+        debugPrint('===============================');
+        
+        // Extract error message from response.data
+        String? errorMessage;
+        if (responseData != null) {
+          if (responseData is Map<String, dynamic>) {
+            // Try to get message from response.data['message']
+            errorMessage = responseData['message']?.toString();
+          } else if (responseData is String) {
+            // If response.data is a string, use it directly
+            errorMessage = responseData;
+          }
+        }
+        
+        // Fallback to statusMessage if message not found in response.data
+        errorMessage ??= exception.response?.statusMessage;
+        
         if (statusCode >= 500) {
-          return ServerFailure(
-            exception.response?.statusMessage ?? 'Server error',
-          );
+          return ServerFailure(errorMessage ?? 'Server error');
         } else if (statusCode == 401 || statusCode == 403) {
-          return const ValidationFailure('Authentication failed');
+          return ValidationFailure(errorMessage ?? 'Authentication failed');
         } else {
-          return ValidationFailure(
-            exception.response?.statusMessage ?? 'Invalid request',
-          );
+          return ValidationFailure(errorMessage ?? 'Invalid request');
         }
       case DioExceptionType.cancel:
         return const NetworkFailure('Request cancelled');

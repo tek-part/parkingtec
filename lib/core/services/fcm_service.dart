@@ -71,9 +71,7 @@ class FcmService {
     if (_fcmToken != null) return _fcmToken;
 
     // If FirebaseMessaging not initialized, initialize it first
-    if (_firebaseMessaging == null) {
-      _firebaseMessaging = FirebaseMessaging.instance;
-    }
+    _firebaseMessaging ??= FirebaseMessaging.instance;
 
     return await _getFcmToken();
   }
@@ -81,9 +79,7 @@ class FcmService {
   /// Get FCM token from Firebase
   static Future<String?> _getFcmToken() async {
     try {
-      if (_firebaseMessaging == null) {
-        _firebaseMessaging = FirebaseMessaging.instance;
-      }
+      _firebaseMessaging ??= FirebaseMessaging.instance;
       
       // Add retry logic for SERVICE_NOT_AVAILABLE error
       int retries = 3;
@@ -150,9 +146,7 @@ class FcmService {
   /// Refresh FCM token
   static Future<String?> refreshToken() async {
     try {
-      if (_firebaseMessaging == null) {
-        _firebaseMessaging = FirebaseMessaging.instance;
-      }
+      _firebaseMessaging ??= FirebaseMessaging.instance;
       
       // Use the same retry logic as _getFcmToken
       return await _getFcmToken();

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
+import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart'
+    hide PrinterType;
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/features/printing/controllers/bluetooth_printer_controller.dart';
 import 'package:parkingtec/features/printing/controllers/sunmi_printer_controller.dart';
+import 'package:parkingtec/features/printing/core/utils/paper_preset.dart';
 import 'package:parkingtec/features/printing/providers/printing_providers.dart';
 import 'package:parkingtec/generated/l10n.dart';
 
@@ -18,9 +21,13 @@ class PrinterSettingsPage extends ConsumerStatefulWidget {
 }
 
 class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
+  String? _selectedPaperWidth; // null or 'auto' or PaperPreset.toString()
+  bool _isLoadingPaperWidth = true;
+
   @override
   void initState() {
     super.initState();
+    _loadPaperWidthSetting();
     // Initialize listeners when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final bluetoothController = ref.read(bluetoothPrinterControllerProvider);
@@ -45,6 +52,52 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
         },
       );
     });
+  }
+
+  Future<void> _loadPaperWidthSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    final paperWidthStr = prefs.getString('printer_paper_width');
+    setState(() {
+      _selectedPaperWidth = paperWidthStr ?? 'auto';
+      _isLoadingPaperWidth = false;
+    });
+  }
+
+  Future<void> _updatePaperWidth(String? value) async {
+    setState(() {
+      _selectedPaperWidth = value;
+    });
+
+    final printingService = ref.read(printingServiceProvider);
+
+    if (value == 'auto') {
+      await printingService.updateSettings(useAuto: true);
+    } else {
+      try {
+        final paperPreset = PaperPreset.values.firstWhere(
+          (e) => e.toString() == value,
+        );
+        await printingService.updateSettings(paperWidth: paperPreset);
+      } catch (e) {
+        // Invalid value, revert to auto
+        await printingService.updateSettings(useAuto: true);
+        setState(() {
+          _selectedPaperWidth = 'auto';
+        });
+      }
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            value == 'auto'
+                ? 'Paper width set to Auto'
+                : 'Paper width set to ${value?.replaceAll('PaperPreset.', '') ?? 'Auto'}',
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -216,6 +269,10 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Paper Width Settings
+        _buildPaperWidthSelector(),
+        SizedBox(height: 16.h),
+
         // Connection Status - Use safe check
         _buildStatusCard(
           S.of(context).connectionStatus,
@@ -270,7 +327,7 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
         SizedBox(height: 16.h),
 
         // Scan Results
-        StreamBuilder<List<BluetoothDevice>>(
+        StreamBuilder<List<PrinterDevice>>(
           stream: controller.scanResults,
           builder: (context, snapshot) {
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -336,6 +393,10 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Paper Width Settings
+        _buildPaperWidthSelector(),
+        SizedBox(height: 16.h),
+
         _buildStatusCard(
           S.of(context).printerTypeSunmi,
           controller.isInitialized
@@ -461,7 +522,7 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
   }
 
   Widget _buildDeviceCard(
-    BluetoothDevice device,
+    PrinterDevice device,
     BluetoothPrinterController controller,
   ) {
     // Check both connectedDevice and isConnected for accurate status
@@ -488,7 +549,7 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
           ),
         ),
         subtitle: Text(
-          device.address,
+          device.address ?? '',
           style: TextStyle(
             color: AppColors.textSecondary(context),
             fontSize: 12.sp,
@@ -538,6 +599,71 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
                 ),
                 child: Text(S.of(context).connect),
               ),
+      ),
+    );
+  }
+
+  Widget _buildPaperWidthSelector() {
+    if (_isLoadingPaperWidth) {
+      return Card(
+        color: AppColors.surface(context),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    return Card(
+      color: AppColors.surface(context),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              S.of(context).paperWidth,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary(context),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            // Radio buttons for paper width selection
+            RadioListTile<String>(
+              title: Text('58mm (${PaperPreset.mm58.width}px)'),
+              value: PaperPreset.mm58.toString(),
+              groupValue: _selectedPaperWidth,
+              onChanged: (value) => _updatePaperWidth(value),
+              activeColor: AppColors.primaryX(context),
+            ),
+            RadioListTile<String>(
+              title: Text('80mm (${PaperPreset.mm80.width}px)'),
+              value: PaperPreset.mm80.toString(),
+              groupValue: _selectedPaperWidth,
+              onChanged: (value) => _updatePaperWidth(value),
+              activeColor: AppColors.primaryX(context),
+            ),
+            RadioListTile<String>(
+              title: Text('110mm (${PaperPreset.mm110.width}px)'),
+              value: PaperPreset.mm110.toString(),
+              groupValue: _selectedPaperWidth,
+              onChanged: (value) => _updatePaperWidth(value),
+              activeColor: AppColors.primaryX(context),
+            ),
+            RadioListTile<String>(
+              title: Text('Auto (Use full printer width)'),
+              subtitle: Text(
+                'Automatically uses maximum width (110mm) or detects from printer name',
+              ),
+              value: 'auto',
+              groupValue: _selectedPaperWidth,
+              onChanged: (value) => _updatePaperWidth(value),
+              activeColor: AppColors.primaryX(context),
+            ),
+          ],
+        ),
       ),
     );
   }

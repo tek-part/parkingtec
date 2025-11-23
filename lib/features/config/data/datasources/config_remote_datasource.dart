@@ -3,7 +3,6 @@ import 'package:parkingtec/core/errors/exception_mapper.dart';
 import 'package:parkingtec/core/errors/failure.dart';
 import 'package:parkingtec/core/services/api_service.dart';
 import 'package:parkingtec/features/config/data/models/app_config.dart';
-import 'package:parkingtec/features/config/data/models/responses/get_app_config_response.dart';
 
 /// Remote data source for app config operations
 /// Handles all API calls related to application configuration

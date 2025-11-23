@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parkingtec/features/auth/data/models/active_daily.dart';
 
@@ -49,6 +50,39 @@ class User {
   /// Check if user has an active daily shift
   bool get hasActiveDaily => activeDaily != null && activeDaily!.isActive;
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) {
+    try {
+      // Handle active_daily safely - it might not be a Map
+      final activeDailyValue = json['active_daily'];
+      final jsonCopy = Map<String, dynamic>.from(json);
+      
+      // If active_daily is not null and not a Map, set it to null
+      if (activeDailyValue != null && activeDailyValue is! Map<String, dynamic>) {
+        debugPrint('Warning: active_daily is not a Map, type: ${activeDailyValue.runtimeType}, value: $activeDailyValue');
+        jsonCopy['active_daily'] = null;
+      }
+      
+      return _$UserFromJson(jsonCopy);
+    } catch (e, stackTrace) {
+      // Log the error for debugging
+      debugPrint('=== USER JSON PARSING ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('JSON: $json');
+      debugPrint('Stack trace: $stackTrace');
+      debugPrint('==============================');
+      
+      // Try to parse without active_daily if it's causing issues
+      try {
+        final jsonWithoutActiveDaily = Map<String, dynamic>.from(json);
+        jsonWithoutActiveDaily.remove('active_daily');
+        debugPrint('Retrying without active_daily...');
+        return _$UserFromJson(jsonWithoutActiveDaily);
+      } catch (e2) {
+        // If that also fails, rethrow the original error
+        rethrow;
+      }
+    }
+  }
+  
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }

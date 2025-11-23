@@ -22,11 +22,12 @@ class BackButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(
-        Icons.arrow_back,
+        Icons.arrow_back_ios_new,
         color: iconColor ?? AppColors.textPrimary(context),
         size: 24.w,
       ),
-      onPressed: onPressed ??
+      onPressed:
+          onPressed ??
           (useDefaultBehavior
               ? () {
                   if (context.canPop()) {
@@ -38,4 +39,3 @@ class BackButtonWidget extends StatelessWidget {
     );
   }
 }
-

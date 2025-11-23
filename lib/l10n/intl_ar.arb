@@ -176,6 +176,8 @@
   "unpaid": "غير مدفوعة",
   "endInvoice": "إنهاء الفاتورة",
   "completeInvoice": "إكمال الفاتورة",
+  "completingInvoice": "جاري إكمال الفاتورة...",
+  "completeWithQr": "إكمال بـ QR",
   "payInvoice": "دفع الفاتورة",
   "pickupInvoice": "استلام السيارة",
   "invoiceCompleted": "تم إكمال الفاتورة بنجاح",
@@ -277,5 +279,7 @@
   "printerNotConnectedMessage": "أنت غير متصل بطابعة. يرجى الاتصال بطابعة لطباعة الفواتير.",
   "goToSettings": "الذهاب إلى الإعدادات",
   "continueWithoutPrinting": "المتابعة بدون طباعة",
-  "printInvoice": "طباعة الفاتورة"
+  "printInvoice": "طباعة الفاتورة",
+  "checkingAuthentication": "جاري التحقق من المصادقة...",
+  "connectionErrorRetrying": "خطأ في الاتصال. جاري إعادة المحاولة..."
 }

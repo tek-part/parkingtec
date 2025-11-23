@@ -6,4 +6,6 @@ class AppImages {
   static const String fullVerticalCar = 'assets/images/full_vertical_car.png';
 
   static const String sides = 'assets/images/sides.png';
+
+  static const String wafyParking = 'assets/images/wafy_parking.png';
 }

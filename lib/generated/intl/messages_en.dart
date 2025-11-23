@@ -100,6 +100,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Car number is required",
     ),
     "carRequested": MessageLookupByLibrary.simpleMessage("Car requested"),
+    "checkingAuthentication": MessageLookupByLibrary.simpleMessage(
+      "Checking authentication...",
+    ),
     "clear": MessageLookupByLibrary.simpleMessage("Clear"),
     "clearHistory": MessageLookupByLibrary.simpleMessage("Clear History"),
     "clearHistoryConfirmation": MessageLookupByLibrary.simpleMessage(
@@ -107,7 +110,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clearSearch": MessageLookupByLibrary.simpleMessage("Clear search"),
     "completeInvoice": MessageLookupByLibrary.simpleMessage("Complete Invoice"),
+    "completeWithQr": MessageLookupByLibrary.simpleMessage("Complete with QR"),
     "completed": MessageLookupByLibrary.simpleMessage("Completed"),
+    "completingInvoice": MessageLookupByLibrary.simpleMessage(
+      "Completing invoice...",
+    ),
     "configError": MessageLookupByLibrary.simpleMessage(
       "Error loading configuration",
     ),
@@ -129,6 +136,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Connected printer shown at top",
     ),
     "connectedToDevice": m0,
+    "connectionErrorRetrying": MessageLookupByLibrary.simpleMessage(
+      "Connection error. Retrying...",
+    ),
     "connectionFailed": MessageLookupByLibrary.simpleMessage(
       "Connection failed",
     ),

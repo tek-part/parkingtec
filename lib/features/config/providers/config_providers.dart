@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/core/errors/failure.dart';
 import 'package:parkingtec/features/config/domain/entities/app_config_entity.dart';
 import 'package:parkingtec/features/config/presentation/controllers/config_controller.dart';

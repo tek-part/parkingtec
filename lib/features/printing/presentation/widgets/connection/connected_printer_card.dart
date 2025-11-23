@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
+import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/generated/l10n.dart';
 
 class ConnectedPrinterCard extends StatelessWidget {
-  final BluetoothDevice connectedDevice;
+  final PrinterDevice connectedDevice;
   final VoidCallback onDisconnect;
 
   const ConnectedPrinterCard({
@@ -21,10 +21,7 @@ class ConnectedPrinterCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.border(context),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.border(context), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,11 +47,7 @@ class ConnectedPrinterCard extends StatelessWidget {
           SizedBox(height: 16.h),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(
-              Icons.print,
-              color: AppColors.primary,
-              size: 32.sp,
-            ),
+            leading: Icon(Icons.print, color: AppColors.primary, size: 32.sp),
             title: Text(
               connectedDevice.name.isEmpty
                   ? S.of(context).unknown
@@ -68,7 +61,7 @@ class ConnectedPrinterCard extends StatelessWidget {
             subtitle: Padding(
               padding: EdgeInsets.only(top: 4.h),
               child: Text(
-                connectedDevice.address,
+                connectedDevice.address ?? '',
                 style: TextStyle(
                   fontSize: 14.sp,
                   color: AppColors.textSecondary(context),
@@ -79,9 +72,7 @@ class ConnectedPrinterCard extends StatelessWidget {
               onPressed: onDisconnect,
               icon: const Icon(Icons.close),
               label: Text(S.of(context).disconnect),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
             ),
           ),
         ],
@@ -89,4 +80,3 @@ class ConnectedPrinterCard extends StatelessWidget {
     );
   }
 }
-

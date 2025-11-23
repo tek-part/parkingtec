@@ -17,11 +17,32 @@ class ReprintInvoiceUseCase {
     AppConfig appConfig,
     PrintJobType jobType,
   ) async {
+    try {
+      bool success;
     switch (jobType) {
       case PrintJobType.entryTicket:
-        return await printingService.printEntryTicket(invoice, appConfig);
+          success = await printingService.printEntryTicket(
+            invoice: invoice,
+            appConfig: appConfig,
+          );
+          break;
       case PrintJobType.exitReceipt:
-        return await printingService.printExitReceipt(invoice, appConfig);
+          success = await printingService.printExitReceipt(
+            invoice: invoice,
+            appConfig: appConfig,
+          );
+          break;
+      }
+
+      if (success) {
+        return const Right(null);
+      } else {
+        return const Left(
+          ServerFailure('Print failed. Please check printer connection.'),
+        );
+      }
+    } catch (e) {
+      return Left(ServerFailure('Print error: ${e.toString()}'));
     }
   }
 }

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/generated/l10n.dart';
+import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 
 class PrinterDiscoveryWidget extends StatelessWidget {
-  final Stream<List<BluetoothDevice>> scanResults$;
+  final Stream<List<PrinterDevice>> scanResults$;
   final bool isScanning;
-  final BluetoothDevice? connectedDevice;
+  final PrinterDevice? connectedDevice;
   final bool isConnected;
   final bool isConnecting;
   final VoidCallback onStartScan;
   final VoidCallback onStopScan;
-  final ValueChanged<BluetoothDevice> onConnectToDevice;
+  final ValueChanged<PrinterDevice> onConnectToDevice;
 
   const PrinterDiscoveryWidget({
     super.key,
@@ -33,10 +33,7 @@ class PrinterDiscoveryWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.border(context),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.border(context), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +64,7 @@ class PrinterDiscoveryWidget extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          StreamBuilder<List<BluetoothDevice>>(
+          StreamBuilder<List<PrinterDevice>>(
             stream: scanResults$,
             initialData: const [],
             builder: (context, snapshot) {
@@ -84,8 +81,8 @@ class PrinterDiscoveryWidget extends StatelessWidget {
                       isScanning
                           ? S.of(context).searchingForPrinters
                           : isConnected
-                              ? S.of(context).connectedPrinterShownAtTop
-                              : S.of(context).noPrintersPressSearch,
+                          ? S.of(context).connectedPrinterShownAtTop
+                          : S.of(context).noPrintersPressSearch,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.textSecondary(context),
@@ -102,14 +99,11 @@ class PrinterDiscoveryWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final device = devices[index];
                   return ListTile(
-                    leading: Icon(
-                      Icons.bluetooth,
-                      color: AppColors.primary,
-                    ),
+                    leading: Icon(Icons.bluetooth, color: AppColors.primary),
                     title: Text(
                       device.name.isEmpty ? S.of(context).unknown : device.name,
                     ),
-                    subtitle: Text(device.address),
+                    subtitle: Text(device.address ?? ''),
                     trailing: ElevatedButton(
                       onPressed: isConnecting
                           ? null
@@ -132,4 +126,3 @@ class PrinterDiscoveryWidget extends StatelessWidget {
     );
   }
 }
-

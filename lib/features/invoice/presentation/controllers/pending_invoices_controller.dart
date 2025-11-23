@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/core/di/providers/usecase_providers.dart';
 import 'package:parkingtec/core/errors/failure.dart';
 import 'package:parkingtec/features/invoice/presentation/states/pending_invoices_state.dart';

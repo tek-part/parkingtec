@@ -1,6 +1,8 @@
 /// API Endpoints Constants
 /// Contains all API endpoint strings used throughout the application
 class ApiEndpoints {
+  /// =================== BASE URL FOR THE API ===================
+  static const String baseUrl = 'https://parking.alwafierp.com/api';
   // ==================== AUTHENTICATION ENDPOINTS ====================
   static const String login = '/login';
   static const String logout = '/logout';

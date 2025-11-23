@@ -91,6 +91,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "رقم السيارة مطلوب",
     ),
     "carRequested": MessageLookupByLibrary.simpleMessage("تم طلب السيارة"),
+    "checkingAuthentication": MessageLookupByLibrary.simpleMessage(
+      "جاري التحقق من المصادقة...",
+    ),
     "clear": MessageLookupByLibrary.simpleMessage("مسح"),
     "clearHistory": MessageLookupByLibrary.simpleMessage("مسح التاريخ"),
     "clearHistoryConfirmation": MessageLookupByLibrary.simpleMessage(
@@ -98,7 +101,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clearSearch": MessageLookupByLibrary.simpleMessage("مسح البحث"),
     "completeInvoice": MessageLookupByLibrary.simpleMessage("إكمال الفاتورة"),
+    "completeWithQr": MessageLookupByLibrary.simpleMessage("إكمال بـ QR"),
     "completed": MessageLookupByLibrary.simpleMessage("مكتملة"),
+    "completingInvoice": MessageLookupByLibrary.simpleMessage(
+      "جاري إكمال الفاتورة...",
+    ),
     "configError": MessageLookupByLibrary.simpleMessage(
       "حدث خطأ في تحميل الإعدادات",
     ),
@@ -118,6 +125,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "الطابعة المتصلة معروضة في الأعلى",
     ),
     "connectedToDevice": m0,
+    "connectionErrorRetrying": MessageLookupByLibrary.simpleMessage(
+      "خطأ في الاتصال. جاري إعادة المحاولة...",
+    ),
     "connectionFailed": MessageLookupByLibrary.simpleMessage("فشل الاتصال"),
     "connectionStatus": MessageLookupByLibrary.simpleMessage("حالة الاتصال"),
     "continueWithoutPrinting": MessageLookupByLibrary.simpleMessage(

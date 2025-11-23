@@ -18,7 +18,7 @@ class TerminateDailyDialog extends ConsumerStatefulWidget {
 
 class _TerminateDailyDialogState
     extends ConsumerState<TerminateDailyDialog> {
-  final TextEditingController _endBalanceController = TextEditingController();
+  final TextEditingController _endBalanceController = TextEditingController( text: '0');
   final TextEditingController _notesController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 

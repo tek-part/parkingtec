@@ -24,6 +24,15 @@ class InvoiceTimer {
     return roundedHours.ceil().toDouble();
   }
 
+  /// Calculate actual hours from duration (without rounding up)
+  /// Used for normal calculation based on actual time
+  static double calculateActualHours(Duration duration) {
+    // Calculate based on actual minutes / 60
+    final hours = duration.inMinutes / 60.0;
+    // Minimum 0.25 hours (15 minutes)
+    return hours < 0.25 ? 0.25 : hours;
+  }
+
   /// Calculate current amount for hourly invoice
   static double? calculateCurrentAmount(Invoice invoice) {
     if (!invoice.isHourlyPricing) return null;
@@ -31,6 +40,20 @@ class InvoiceTimer {
 
     final duration = calculateDuration(invoice);
     final hours = calculateHours(duration);
+    final amount = invoice.hourlyRate! * hours;
+
+    // Round to 2 decimal places
+    return double.parse(amount.toStringAsFixed(2));
+  }
+
+  /// Calculate current amount for hourly invoice using actual time (without rounding up)
+  /// Used for normal calculation in complete dialog
+  static double? calculateCurrentAmountActual(Invoice invoice) {
+    if (!invoice.isHourlyPricing) return null;
+    if (invoice.hourlyRate == null) return null;
+
+    final duration = calculateDuration(invoice);
+    final hours = calculateActualHours(duration);
     final amount = invoice.hourlyRate! * hours;
 
     // Round to 2 decimal places
