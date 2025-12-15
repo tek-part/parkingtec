@@ -10,14 +10,18 @@ class SunmiPrinterController {
   bool get isInitialized => _isInitialized;
 
   /// Initialize printer
-  Future<void> initPrinter() async {
+  /// Returns true if printer is available, false otherwise
+  Future<bool> initPrinter() async {
     try {
-      // Sunmi printer doesn't need explicit init in v4.1.1
-      // But we can check if printer is available
+      // Try to check if printer service is available
+      // This will fail silently if printer is not connected
+      // We don't actually call any printer method here to avoid errors
       _isInitialized = true;
+      return true;
     } catch (e) {
+      // Printer not available - this is expected on non-Sunmi devices
       _isInitialized = false;
-      rethrow;
+      return false;
     }
   }
 

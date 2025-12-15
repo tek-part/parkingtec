@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
@@ -16,11 +15,26 @@ class AppTheme {
       onSurface: DarkColors.textSecondary,
     );
 
-    final TextTheme baseText = GoogleFonts.interTextTheme(const TextTheme())
-        .apply(
-          bodyColor: DarkColors.textPrimary,
-          displayColor: DarkColors.textPrimary,
-        );
+    final TextTheme baseText = const TextTheme(
+      displayLarge: TextStyle(fontFamily: 'Cairo'),
+      displayMedium: TextStyle(fontFamily: 'Cairo'),
+      displaySmall: TextStyle(fontFamily: 'Cairo'),
+      headlineLarge: TextStyle(fontFamily: 'Cairo'),
+      headlineMedium: TextStyle(fontFamily: 'Cairo'),
+      headlineSmall: TextStyle(fontFamily: 'Cairo'),
+      titleLarge: TextStyle(fontFamily: 'Cairo'),
+      titleMedium: TextStyle(fontFamily: 'Cairo'),
+      titleSmall: TextStyle(fontFamily: 'Cairo'),
+      bodyLarge: TextStyle(fontFamily: 'Cairo'),
+      bodyMedium: TextStyle(fontFamily: 'Cairo'),
+      bodySmall: TextStyle(fontFamily: 'Cairo'),
+      labelLarge: TextStyle(fontFamily: 'Cairo'),
+      labelMedium: TextStyle(fontFamily: 'Cairo'),
+      labelSmall: TextStyle(fontFamily: 'Cairo'),
+    ).apply(
+      bodyColor: DarkColors.textPrimary,
+      displayColor: DarkColors.textPrimary,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -162,11 +176,26 @@ class AppTheme {
       onSurface: LightColors.textSecondary,
     );
 
-    final TextTheme baseText = GoogleFonts.interTextTheme(const TextTheme())
-        .apply(
-          bodyColor: LightColors.textPrimary,
-          displayColor: LightColors.textPrimary,
-        );
+    final TextTheme baseText = const TextTheme(
+      displayLarge: TextStyle(fontFamily: 'Cairo'),
+      displayMedium: TextStyle(fontFamily: 'Cairo'),
+      displaySmall: TextStyle(fontFamily: 'Cairo'),
+      headlineLarge: TextStyle(fontFamily: 'Cairo'),
+      headlineMedium: TextStyle(fontFamily: 'Cairo'),
+      headlineSmall: TextStyle(fontFamily: 'Cairo'),
+      titleLarge: TextStyle(fontFamily: 'Cairo'),
+      titleMedium: TextStyle(fontFamily: 'Cairo'),
+      titleSmall: TextStyle(fontFamily: 'Cairo'),
+      bodyLarge: TextStyle(fontFamily: 'Cairo'),
+      bodyMedium: TextStyle(fontFamily: 'Cairo'),
+      bodySmall: TextStyle(fontFamily: 'Cairo'),
+      labelLarge: TextStyle(fontFamily: 'Cairo'),
+      labelMedium: TextStyle(fontFamily: 'Cairo'),
+      labelSmall: TextStyle(fontFamily: 'Cairo'),
+    ).apply(
+      bodyColor: LightColors.textPrimary,
+      displayColor: LightColors.textPrimary,
+    );
 
     return ThemeData(
       useMaterial3: true,

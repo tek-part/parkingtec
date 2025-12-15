@@ -412,19 +412,31 @@ class _PrinterSettingsPageState extends ConsumerState<PrinterSettingsPage> {
           onPressed: () async {
             try {
               await controller.initPrinter();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context).printerInitialized)),
-                );
-                setState(() {});
+              if (!mounted) return;
+
+              final String message;
+              final Color bgColor;
+              if (controller.isInitialized) {
+                message = S.of(context).printerInitialized;
+                bgColor = AppColors.success;
+              } else {
+                message =
+                    'Printer not available. This device may not have a Sunmi printer.';
+                bgColor = AppColors.warning;
               }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(message), backgroundColor: bgColor),
+              );
+              setState(() {});
             } catch (e) {
-              if (mounted) {
-                print('initError: $e');
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('Init error: $e')));
-              }
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Init error: $e'),
+                  backgroundColor: AppColors.error,
+                ),
+              );
             }
           },
           icon: const Icon(Icons.power_settings_new),

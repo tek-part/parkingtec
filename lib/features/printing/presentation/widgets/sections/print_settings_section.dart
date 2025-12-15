@@ -31,7 +31,32 @@ class _PrintSettingsSectionState extends ConsumerState<PrintSettingsSection> {
       if (printerType == PrinterType.sunmi) {
         final sunmiController = ref.read(sunmiPrinterControllerProvider);
         if (!sunmiController.isInitialized) {
-          await sunmiController.initPrinter();
+          try {
+            await sunmiController.initPrinter();
+            if (!sunmiController.isInitialized) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Sunmi printer not available. Please connect a Sunmi printer or use Bluetooth printer.',
+                  ),
+                  backgroundColor: AppColors.warning,
+                ),
+              );
+              return;
+            }
+          } catch (e) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Sunmi printer not available. Please connect a Sunmi printer or use Bluetooth printer.',
+                ),
+                backgroundColor: AppColors.warning,
+              ),
+            );
+            return;
+          }
         }
         await sunmiController.printText(
           'Test Print',

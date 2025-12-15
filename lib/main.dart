@@ -24,18 +24,38 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Suppress uncaught exceptions from plugins during initialization
+  // This prevents crashes from plugins like Sunmi printer that may not be available
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Log error but don't crash the app for plugin initialization errors
+    if (details.exception.toString().contains('print service') ||
+        details.exception.toString().contains('Sunmi') ||
+        details.exception.toString().contains('google_fonts')) {
+      // These are expected errors on devices without specific hardware/services
+      debugPrint('Plugin initialization warning: ${details.exception}');
+      return;
+    }
+    // Let other errors be handled normally
+    FlutterError.presentError(details);
+  };
 
-  // Initialize FCM Service for device token
-  await FcmService.initialize();
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Register background message handler
-  FcmService.setBackgroundMessageHandler(firebaseMessagingBackgroundHandler);
+    // Initialize FCM Service for device token
+    await FcmService.initialize();
 
-  // Initialize API Service before app starts
-  // This ensures ApiService is ready when providers access it
-  await ApiService.getInstance();
+    // Register background message handler
+    FcmService.setBackgroundMessageHandler(firebaseMessagingBackgroundHandler);
+
+    // Initialize API Service before app starts
+    // This ensures ApiService is ready when providers access it
+    await ApiService.getInstance();
+  } catch (e) {
+    // Log initialization errors but don't crash
+    debugPrint('Initialization error: $e');
+  }
 
   runApp(const ProviderScope(child: TecParkingApp()));
 }
