@@ -28,6 +28,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>يستخدم التطبيق الكاميرا لمسح رموز QR الخاصة بتذاكر السيارات لتسريع عملية الدخول والخروج.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>يستخدم التطبيق البلوتوث للاتصال بطابعات POS الحرارية و طباعة التذاكر والفواتير.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>يستخدم التطبيق البلوتوث للاتصال بطابعات POS الحرارية و طباعة التذاكر والفواتير.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

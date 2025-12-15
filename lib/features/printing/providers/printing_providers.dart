@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:parkingtec/features/printing/controllers/bluetooth_printer_controller.dart';
@@ -20,10 +22,15 @@ final printerTypeProvider = StateProvider<PrinterType>((ref) {
 });
 
 /// Bluetooth Printer Controller Provider
+///
+/// Returns a platform-specific implementation while keeping a single
+/// interface for the rest of the app.
 final bluetoothPrinterControllerProvider =
     Provider<BluetoothPrinterController>((ref) {
-  final controller = BluetoothPrinterController();
-  ref.onDispose(() => controller.dispose());
+  final controller = Platform.isIOS
+      ? IosBluetoothPrinterController()
+      : AndroidBluetoothPrinterController();
+  ref.onDispose(controller.dispose);
   return controller;
 });
 
