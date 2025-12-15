@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parkingtec/core/routing/routes.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
+import 'package:parkingtec/features/auth/presentation/states/auth_state.dart';
 import 'package:parkingtec/features/auth/presentation/widgets/logout_dialog.dart';
 import 'package:parkingtec/features/auth/providers/auth_providers.dart';
 import 'package:parkingtec/features/daily/presentation/widgets/terminate_daily_dialog.dart';

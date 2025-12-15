@@ -15,4 +15,7 @@ GetInvoiceResponse _$GetInvoiceResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$GetInvoiceResponseToJson(GetInvoiceResponse instance) =>
-    <String, dynamic>{'data': instance.invoice, 'message': instance.message};
+    <String, dynamic>{
+      'data': instance.invoice,
+      'message': instance.message,
+    };

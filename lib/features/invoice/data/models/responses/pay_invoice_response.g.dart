@@ -15,7 +15,10 @@ PayInvoiceResponse _$PayInvoiceResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$PayInvoiceResponseToJson(PayInvoiceResponse instance) =>
-    <String, dynamic>{'data': instance.data, 'message': instance.message};
+    <String, dynamic>{
+      'data': instance.data,
+      'message': instance.message,
+    };
 
 PayInvoiceData _$PayInvoiceDataFromJson(Map<String, dynamic> json) =>
     PayInvoiceData(

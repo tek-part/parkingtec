@@ -15,4 +15,7 @@ GetProfileResponse _$GetProfileResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$GetProfileResponseToJson(GetProfileResponse instance) =>
-    <String, dynamic>{'data': instance.user, 'message': instance.message};
+    <String, dynamic>{
+      'data': instance.user,
+      'message': instance.message,
+    };

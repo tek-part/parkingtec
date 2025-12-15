@@ -8,9 +8,9 @@ class LoginRequest {
   final String phone;
   final String password;
   @JsonKey(name: 'device_token')
-  final String? deviceToken;
+  String? deviceToken;
 
-  const LoginRequest({
+  LoginRequest({
     required this.phone,
     required this.password,
     this.deviceToken,

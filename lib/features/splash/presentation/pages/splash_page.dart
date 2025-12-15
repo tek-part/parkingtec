@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:parkingtec/core/routing/routes.dart';
 import 'package:parkingtec/core/theme/app_colors.dart';
 import 'package:parkingtec/core/utils/app_images.dart';
+import 'package:parkingtec/features/auth/presentation/states/auth_state.dart';
 import 'package:parkingtec/features/auth/providers/auth_providers.dart';
+import 'package:parkingtec/features/config/presentation/states/config_state.dart';
 import 'package:parkingtec/features/config/providers/config_providers.dart';
 import 'package:parkingtec/generated/l10n.dart';
 

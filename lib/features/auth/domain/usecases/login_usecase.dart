@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:parkingtec/core/errors/failure.dart';
+import 'package:parkingtec/core/services/fcm_service.dart';
 import 'package:parkingtec/features/auth/data/models/requests/login_request.dart';
 import 'package:parkingtec/features/auth/data/models/responses/login_response.dart';
 import 'package:parkingtec/features/auth/domain/repositories/auth_repository.dart';
@@ -19,7 +20,12 @@ class LoginUseCase {
     if (request.password.isEmpty) {
       return const Left(ValidationFailure('Password is required'));
     }
-
+    if (request.deviceToken == null) {
+      request.deviceToken = await FcmService.getFcmToken();
+      if (request.deviceToken == null) {
+       request.deviceToken = '123456789012345678901234';
+      }
+    }
     return await _authRepository.login(request);
   }
 }

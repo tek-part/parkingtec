@@ -8,6 +8,7 @@ import 'package:parkingtec/core/widgets/qr_scanner_widget.dart';
 import 'package:parkingtec/features/config/providers/config_providers.dart';
 import 'package:parkingtec/features/invoice/data/models/invoice.dart';
 import 'package:parkingtec/features/invoice/data/models/requests/complete_invoice_request.dart';
+import 'package:parkingtec/features/invoice/presentation/states/complete_invoice_state.dart';
 import 'package:parkingtec/features/invoice/presentation/widgets/complete_invoice_dialog.dart';
 import 'package:parkingtec/features/invoice/providers/invoice_providers.dart';
 import 'package:parkingtec/features/printing/presentation/widgets/dialogs/printer_not_connected_dialog.dart';
